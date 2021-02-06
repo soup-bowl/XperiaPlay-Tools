@@ -33,44 +33,50 @@ fi
 echo "Preparing $1 for flashing."
 if [ -d "./prepared" ]
 then
-    echo "A previous prepared firmware was found. Removing..."
+	echo "A previous prepared firmware was found. Removing..."
 	rm -r prepared/
 fi
 unzip -q $file -d ./prepared
 echo "Extraction complete."
 
 # --- Identify user desires ---
-echo "What level of flash do you want?"
+echo "What level of flash do you want?."
+echo "This tool will not interact with baseband, please use flashtool for a complete flash instead."
 echo ""
 echo "[1] Flash kernel."
 echo "[2] Flash system."
 echo "[3] Flash kernel + system."
-#echo "[4] Complete flash."
+echo "[4] Complete flash."
 echo "[q] Cancel."
 echo ""
 read -p 'choose [q]: ' choice
 
 commands=()
 case "$choice" in
+	"1")
+		if test -f "./prepared/kernel.sin"; then cominpt=`realpath ./prepared/kernel.sin`; commands+=( "boot $cominpt" ); fi
+		;;
 
-  "1")
-	if test -f "./prepared/kernel.sin"; then cominpt=`realpath ./prepared/kernel.sin`; commands+=( "boot $cominpt" ); fi
-	;;
+	"2")
+		if test -f "./prepared/system.sin"; then cominpt=`realpath ./prepared/system.sin`; commands+=( "system $cominpt" ); fi
+		;;
 
-  "2")
-	if test -f "./prepared/system.sin"; then cominpt=`realpath ./prepared/system.sin`; commands+=( "system $cominpt" ); fi
-	;;
+	"3")
+		if test -f "./prepared/kernel.sin"; then cominpt=`realpath ./prepared/kernel.sin`; commands+=( "boot $cominpt" ); fi
+		if test -f "./prepared/system.sin"; then cominpt=`realpath ./prepared/system.sin`; commands+=( "system $cominpt" ); fi
+		;;
 
-  "3")
-	if test -f "./prepared/kernel.sin"; then cominpt=`realpath ./prepared/kernel.sin`; commands+=( "boot $cominpt" ); fi
-	if test -f "./prepared/system.sin"; then cominpt=`realpath ./prepared/system.sin`; commands+=( "system $cominpt" ); fi
-	;;
+	"4")
+		if test -f "./prepared/kernel.sin"; then cominpt=`realpath ./prepared/kernel.sin`; commands+=( "boot $cominpt" ); fi
+		if test -f "./prepared/system.sin"; then cominpt=`realpath ./prepared/system.sin`; commands+=( "system $cominpt" ); fi
+		if test -f "./prepared/userdata.sin"; then cominpt=`realpath ./prepared/userdata.sin`; commands+=( "userdata $cominpt" ); fi
+		;;
 
-  *)
-	rm -r prepared/
-	echo "Clean up and exited."
-	exit
-	;;
+	*)
+		rm -r prepared/
+		echo "Clean up and exited."
+		exit
+		;;
 esac
 
 # --- Detect Device ---
