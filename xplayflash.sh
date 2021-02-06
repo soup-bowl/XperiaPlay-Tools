@@ -16,6 +16,10 @@ then
 fi
 
 echo "Preparing $1 for flashing."
+if [ -d "./prepared" ]; then
+    echo "A previous prepared firmware was found. Removing..."
+	rm -r prepared/
+fi
 unzip -q $file -d ./prepared
 echo "Extraction complete."
 
