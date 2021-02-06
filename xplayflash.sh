@@ -2,6 +2,10 @@
 
 file=`realpath $1`
 
+echo "XPlayFlash by soup-bowl - Version 0.1-Alpha"
+echo "Works with R800i on Linux-based commands with fastboot."
+echo "-----------------------------"
+
 # --- Pre-run tests ---
 # Test for ADB.
 if ! command -v fastboot &> /dev/null
