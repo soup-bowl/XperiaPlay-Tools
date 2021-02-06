@@ -28,7 +28,7 @@ echo ""
 echo "[1] Flash kernel."
 echo "[2] Flash system."
 echo "[3] Flash kernel + system."
-echo "[4] Complete flash (TBD)."
+#echo "[4] Complete flash."
 echo "[q] Cancel."
 echo ""
 read -p 'choose [q]: ' choice
@@ -37,16 +37,16 @@ commands=()
 case "$choice" in
 
   "1")
-	if test -f "./prepared/kernel.sin"; then commands+=( 'boot' `realpath ./prepared/kernel.sin` ); fi
+	if test -f "./prepared/kernel.sin"; then cominpt=`realpath ./prepared/kernel.sin`; commands+=( "boot $cominpt" ); fi
 	;;
 
   "2")
-	if test -f "./prepared/system.sin"; then commands+=( 'system' `realpath ./prepared/system.sin` ); fi
+	if test -f "./prepared/system.sin"; then cominpt=`realpath ./prepared/system.sin`; commands+=( "system $cominpt" ); fi
 	;;
 
   "3")
-	if test -f "./prepared/kernel.sin"; then commands+=( 'boot' `realpath ./prepared/kernel.sin` ); fi
-	if test -f "./prepared/system.sin"; then commands+=( 'system' `realpath ./prepared/system.sin` ); fi
+	if test -f "./prepared/kernel.sin"; then cominpt=`realpath ./prepared/kernel.sin`; commands+=( "boot $cominpt" ); fi
+	if test -f "./prepared/system.sin"; then cominpt=`realpath ./prepared/system.sin`; commands+=( "system $cominpt" ); fi
 	;;
 
   *)
@@ -56,5 +56,16 @@ case "$choice" in
 	;;
 esac
 
-echo ${commands[*]}
+echo "Passing instructions over to fastboot."
+devchk=`fastboot devices`
+
+for i in "${commands[@]}"
+do
+	echo "> fastboot flash $i" 
+	fastboot flash $i
+done
+
+echo "Flashing complete, rebooting..."
+fastboot reboot &> /dev/null
+
 exit
