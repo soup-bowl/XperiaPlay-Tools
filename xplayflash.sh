@@ -17,7 +17,7 @@ fi
 # Test file input.
 if [ ${file: -4} != ".ftf" ]
 then
-	echo "Error: Input is not an .ftf file."
+	echo "Error: Input is not an .ftf file (spaces in the path can cause problems too)."
 	exit
 fi
 
@@ -95,9 +95,10 @@ then
 
 	echo "Flashing complete, rebooting..."
 	fastboot reboot &> /dev/null
-
-	exit
 else
 	echo "Device identifer was incorrect. Discovered '$devindt'. Expecting R800i, or R800x."
-	exit
 fi
+
+rm -r prepared/
+echo "Clean up and exited."
+exit
