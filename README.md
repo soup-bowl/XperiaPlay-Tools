@@ -6,7 +6,7 @@ The correct method for this device is to use **[Flashtool](https://github.com/An
 
 ## 🤖 xdb (adb - Android Debugging Bridge)
 This provides interactions with the running firmware. Currently you can:
-* Root the device using zergRush (exploitable firmwares only).
+* Root the device using zergRush (exploitable firmwares only - based upon [DooMLoRD implementation](https://forum.xda-developers.com/t/04-jan-rooting-unrooting-doomlords-easy-rooting-toolkit-v4-0-zergrush-exploit.1321582/)).
 
 Tested against R800i only.
 
