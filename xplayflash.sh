@@ -14,7 +14,7 @@ fi
 if [[ -z "$1" ]]
 then
 	echo "Error: No flash file (.ftf) specified."
-	exit
+	exit 1
 fi
 file=`realpath $1`
 
