@@ -1,24 +1,28 @@
 #! /bin/bash
-
-file=`realpath $1`
-
 echo "XPlayFlash by soup-bowl - Version 0.1-Alpha"
 echo "Works with R800i on Linux-based commands with fastboot."
 echo "-----------------------------"
 
 # --- Pre-run tests ---
 # Test for ADB.
-if ! command -v fastboot &> /dev/null
+if ! command -v fastboot > /dev/null 2>&1
 then
 	echo "Error: ADB package (specifically fastboot) not found."
-	exit
+	exit 1
 fi
 
+if [[ -z "$1" ]]
+then
+	echo "Error: No flash file (.ftf) specified."
+	exit
+fi
+file=`realpath $1`
+
 # Test file input.
-if [ ${file: -4} != ".ftf" ]
+if [[ ${file: -4} != ".ftf" ]]
 then
 	echo "Error: Input is not an .ftf file (spaces in the path can cause problems too)."
-	exit
+	exit 1
 fi
 
 isplugged=`fastboot devices 2>&1`
