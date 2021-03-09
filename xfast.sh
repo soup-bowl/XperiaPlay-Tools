@@ -11,20 +11,6 @@ then
 	exit 1
 fi
 
-if [[ -z "$1" ]]
-then
-	echo "Error: No flash file (.ftf) specified."
-	exit 1
-fi
-file=`realpath $1`
-
-# Test file input.
-if [[ ${file: -4} != ".ftf" ]]
-then
-	echo "Error: Input is not an .ftf file (spaces in the path can cause problems too)."
-	exit 1
-fi
-
 isplugged=`fastboot devices 2>&1`
 if [[ $isplugged == "" ]]
 then
@@ -33,76 +19,132 @@ then
 	exit
 fi
 
-# Remove leftover firmware files.
-echo "Preparing $1 for flashing."
-if [ -d "./prepared" ]
-then
-	echo "A previous prepared firmware was found. Removing..."
-	rm -r prepared/
-fi
-unzip -q $file -d ./prepared
-echo "Extraction complete."
-
-# --- Identify user desires ---
-echo "What level of flash do you want?."
-echo "This tool will not interact with baseband, please use flashtool for a complete flash instead."
-echo ""
-echo "[1] Flash kernel."
-echo "[2] Flash system."
-echo "[3] Flash kernel + system."
-echo "[4] Complete flash."
-echo "[q] Cancel."
-echo ""
-read -p 'choose [q]: ' choice
-
-commands=()
-case "$choice" in
-	"1")
-		if test -f "./prepared/kernel.sin"; then cominpt=`realpath ./prepared/kernel.sin`; commands+=( "boot $cominpt" ); fi
-		;;
-
-	"2")
-		if test -f "./prepared/system.sin"; then cominpt=`realpath ./prepared/system.sin`; commands+=( "system $cominpt" ); fi
-		;;
-
-	"3")
-		if test -f "./prepared/kernel.sin"; then cominpt=`realpath ./prepared/kernel.sin`; commands+=( "boot $cominpt" ); fi
-		if test -f "./prepared/system.sin"; then cominpt=`realpath ./prepared/system.sin`; commands+=( "system $cominpt" ); fi
-		;;
-
-	"4")
-		if test -f "./prepared/kernel.sin"; then cominpt=`realpath ./prepared/kernel.sin`; commands+=( "boot $cominpt" ); fi
-		if test -f "./prepared/system.sin"; then cominpt=`realpath ./prepared/system.sin`; commands+=( "system $cominpt" ); fi
-		if test -f "./prepared/userdata.sin"; then cominpt=`realpath ./prepared/userdata.sin`; commands+=( "userdata $cominpt" ); fi
-		;;
-
-	*)
-		rm -r prepared/
-		echo "Clean up and exited."
-		exit
-		;;
-esac
-
 # --- Detect Device ---
 devindt=`fastboot getvar product 2>&1` # FB writes the response to stderr
 devindt=`echo $devindt | cut -f2 -d ":" | cut -f2 -d " "`
-
-# --- Fastboot Command Execution ---
-if [[ $devindt == "R800i" || $devindt == "R800x" ]]
+if [[ $devindt == "R800i" ]]
 then
-	echo "Xperia PLAY $devindt detected - Passing instructions over to fastboot."
-	for i in "${commands[@]}"
-	do
-		echo "> fastboot flash $i" 
-		fastboot flash $i
-	done
-
-	echo "Flashing complete, rebooting..."
-	fastboot reboot &> /dev/null
+	echo "Xperia PLAY $devindt detected!"
 else
 	echo "Device identifer was incorrect. Discovered '$devindt'. Expecting R800i, or R800x."
+	exit
 fi
 
-rm -r prepared/
-echo "Clean up and exited."
-exit
+# --- Identify user desires ---
+echo "What do you want to do?"
+echo ""
+echo "[1] Flash firmware."
+echo ""
+echo "[r] Reboot device."
+echo "[q] Cancel."
+echo ""
+read -p 'choose [q]: ' choice
+commands=()
+case "$choice" in
+	"1")
+		# --- Flash Section ---
+		fws=($( ls firmwares/*.ftf ))
+		echo ${fws[1]}
+		echo "Select firmware?"
+		echo ""
+		for ((i=0; i<${#fws[@]}; i++))
+		do
+			echo "[${i}] ${fws[$i]}."
+		done
+		echo ""
+		read -p 'choose [0]: ' choice
+
+		file="${fws[${choice}]}"
+		if test -f $file
+		then
+			# Remove leftover firmware files.
+			echo "Preparing $file for flashing."
+			if [ -d "./prepared" ]
+			then
+				echo "A previous prepared firmware was found. Removing..."
+				rm -r prepared/
+			fi
+			unzip -q $file -d ./prepared
+			echo "Extraction complete."
+
+			# --- Identify user desires ---
+			echo "What level of flash do you want?."
+			echo "This tool will not interact with baseband, please use flashtool for a complete flash instead."
+			echo ""
+			echo "[1] Flash kernel."
+			echo "[2] Flash system."
+			echo "[3] Flash kernel + system."
+			echo "[4] Complete flash."
+			echo "[q] Cancel."
+			echo ""
+			read -p 'choose [q]: ' choice
+
+			commands=()
+			case "$choice" in
+				"1")
+					if test -f "./prepared/kernel.sin"; then cominpt=`realpath ./prepared/kernel.sin`; commands+=( "boot $cominpt" ); fi
+					;;
+
+				"2")
+					if test -f "./prepared/system.sin"; then cominpt=`realpath ./prepared/system.sin`; commands+=( "system $cominpt" ); fi
+					;;
+
+				"3")
+					if test -f "./prepared/kernel.sin"; then cominpt=`realpath ./prepared/kernel.sin`; commands+=( "boot $cominpt" ); fi
+					if test -f "./prepared/system.sin"; then cominpt=`realpath ./prepared/system.sin`; commands+=( "system $cominpt" ); fi
+					;;
+
+				"4")
+					if test -f "./prepared/kernel.sin"; then cominpt=`realpath ./prepared/kernel.sin`; commands+=( "boot $cominpt" ); fi
+					if test -f "./prepared/system.sin"; then cominpt=`realpath ./prepared/system.sin`; commands+=( "system $cominpt" ); fi
+					if test -f "./prepared/userdata.sin"; then cominpt=`realpath ./prepared/userdata.sin`; commands+=( "userdata $cominpt" ); fi
+					;;
+
+				*)
+					rm -r prepared/
+					echo "Clean up and exited."
+					exit
+					;;
+			esac
+
+			# --- Detect Device ---
+			devindt=`fastboot getvar product 2>&1` # FB writes the response to stderr
+			devindt=`echo $devindt | cut -f2 -d ":" | cut -f2 -d " "`
+
+			# --- Fastboot Command Execution ---
+			if [[ $devindt == "R800i" || $devindt == "R800x" ]]
+			then
+				echo "Xperia PLAY $devindt detected - Passing instructions over to fastboot."
+				for i in "${commands[@]}"
+				do
+					echo "> fastboot flash $i" 
+					fastboot flash $i
+				done
+
+				echo "Flashing complete, rebooting..."
+				fastboot reboot &> /dev/null
+			else
+				echo "Device identifer was incorrect. Discovered '$devindt'. Expecting R800i, or R800x."
+			fi
+
+			rm -r prepared/
+			echo "Clean up and exited."
+			exit
+		else
+			exit
+		fi
+		# --- End of Flash Section ---
+
+		exit
+		;;
+
+	"r")
+		fastboot continue
+		exit
+		;;
+
+	*)
+		echo "Exited."
+		exit
+		;;
+esac

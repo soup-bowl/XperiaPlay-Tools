@@ -15,7 +15,8 @@ fi
 echo "What do you want to do?"
 echo ""
 echo "[1] Root device."
-echo "[2] Reboot into fastboot and run xfast."
+echo ""
+echo "[r] Reboot into fastboot."
 echo "[q] Cancel."
 echo ""
 read -p 'choose [q]: ' choice
@@ -67,7 +68,7 @@ case "$choice" in
 		exit
 		;;
 	
-	"2")
+	"r")
 		echo "Rebooting. xfast command will work in fastboot mode."
 		adb reboot bootloader
 		exit
