@@ -56,6 +56,7 @@ fi
 echo "What do you want to do?"
 echo ""
 echo "[1] Root device."
+echo "[2] Install apps."
 echo ""
 echo "[r] Reboot into fastboot."
 echo "[q] Cancel."
@@ -107,6 +108,15 @@ case "$choice" in
 		echo ""
 		echo "Device rooted. Rebooting..."
 		adb reboot
+		exit
+		;;
+	
+	"2")
+		apks=($( ls apps/*.apk ))
+		for ((i=0; i<${#apks[@]}; i++))
+		do
+			adb install ${apks[$i]}
+		done
 		exit
 		;;
 	

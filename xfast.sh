@@ -44,7 +44,6 @@ case "$choice" in
 	"1")
 		# --- Flash Section ---
 		fws=($( ls firmwares/*.ftf ))
-		echo ${fws[1]}
 		echo "Select firmware?"
 		echo ""
 		for ((i=0; i<${#fws[@]}; i++))
