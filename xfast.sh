@@ -26,7 +26,7 @@ if [[ $devindt == "R800i" ]]
 then
 	echo "Xperia PLAY $devindt detected!"
 else
-	echo "Device identifer was incorrect. Discovered '$devindt'. Expecting R800i, or R800x."
+	echo "Device identifer was incorrect. Discovered '$devindt'. Expecting R800i."
 	exit
 fi
 
