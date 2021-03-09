@@ -3,9 +3,7 @@ echo "XPlayADB by soup-bowl - Version 0.1-Alpha"
 echo "Works with R800i on Linux-based commands with fastboot."
 echo "-----------------------------"
 
-# Trims $1
-# If $2 supplied, assigns result to variable named $2
-# If $2 not present, echoes the value to stdout
+# Trims response from adb shell.
 # Modified from https://stackoverflow.com/a/43432097
 trim()
 {
