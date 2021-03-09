@@ -24,6 +24,17 @@ then
 	exit 1
 fi
 
+isplugged=`adb get-state`
+if [[ $isplugged == "" ]]
+then
+	echo ""
+	echo "Unable to get an Android Debugging response from phone."
+	echo "Make sure that your phone:"
+	echo "1) Is plugged in to a USB port with a cable that supports data transmission."
+	echo "2) USB Debugging is enabled in settings > Applications > Development > USB debugging."
+	exit 1
+fi
+
 trim $(adb shell getprop ro.product.model) 'device'
 if [[ $device == "R800i" ]]
 then
@@ -31,6 +42,14 @@ then
 else
 	echo "Device identifer was incorrect. Discovered '$device'. Expecting R800i."
 	exit 1
+fi
+
+isrootcmd=$(adb shell stat /system/bin/su 2>&1)
+if [[ $isrootcmd == *"No such file or"* || $isrootcmd == *"permission den"* ]]
+then
+	echo "Xperia is not rooted (no su detected or permission denied)."
+else
+	echo "Xperia appears to be rooted (su detected)."
 fi
 
 # --- Identify user desires ---
@@ -51,11 +70,12 @@ case "$choice" in
 		# https://forum.xda-developers.com/t/04-jan-rooting-unrooting-doomlords-easy-rooting-toolkit-v4-0-zergrush-exploit.1321582/
 		# https://forum.xda-developers.com/t/how-to-zergrush-root-root-w-v2-2-x-2-3-x-not-ics-4-x-or-gb-after-11-2011.1312859/
 
-		#resp=`adb shell echo true`
-		#if [[ $resp != true ]]
-		#then
-		#	echo "Error: Unable to run commands on device. Ensure ONLY the Xperia PLAY is plugged in, and Android Debugging is enabled."
-		#	exit 1
+		trim $(adb shell echo true) 'resp'
+		if [[ $resp != "true" ]]
+		then
+			echo "Error: Unable to run commands on device. Ensure ONLY the Xperia PLAY is plugged in, and Android Debugging is enabled."
+			exit 1
+		fi
 
 		echo "Preparing for exploit."
 		adb shell "mkdir /data/local/rootmp"
