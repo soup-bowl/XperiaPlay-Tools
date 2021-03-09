@@ -3,11 +3,36 @@ echo "XPlayADB by soup-bowl - Version 0.1-Alpha"
 echo "Works with R800i on Linux-based commands with fastboot."
 echo "-----------------------------"
 
+# Trims $1
+# If $2 supplied, assigns result to variable named $2
+# If $2 not present, echoes the value to stdout
+# Modified from https://stackoverflow.com/a/43432097
+trim()
+{
+	if [[ $1 =~ ^[[:space:]]*(.*[^[:space:]])[[:space:]]*$ ]]
+	then
+		local result="${BASH_REMATCH[1]}"
+	else
+		local result="$1"
+	fi
+	eval $2=$result
+}
+
 # --- Pre-run tests ---
 # Test for ADB.
 if ! command -v adb > /dev/null 2>&1
 then
 	echo "Error: ADB package not found."
+	exit 1
+fi
+
+model=$(adb shell getprop ro.product.model)
+trim $model device
+if [[ $device == "R800i" ]]
+then
+	echo "Xperia PLAY $device detected!"
+else
+	echo "Device identifer was incorrect. Discovered '$device'. Expecting R800i."
 	exit 1
 fi
 
