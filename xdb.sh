@@ -26,8 +26,7 @@ then
 	exit 1
 fi
 
-model=$(adb shell getprop ro.product.model)
-trim $model device
+trim $(adb shell getprop ro.product.model) 'device'
 if [[ $device == "R800i" ]]
 then
 	echo "Xperia PLAY $device detected!"
