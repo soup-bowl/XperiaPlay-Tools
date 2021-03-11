@@ -52,6 +52,11 @@ else
 	echo "Xperia appears to be rooted (su detected)."
 fi
 
+echo "" >> ./system.log
+echo "Starting xdb for $device" >> ./system.log
+date >> ./system.log
+echo "---------------" >> ./system.log
+
 # --- Identify user desires ---
 echo "What do you want to do?"
 echo ""
@@ -78,33 +83,30 @@ case "$choice" in
 			exit 1
 		fi
 
-		echo "Preparing for exploit."
-		adb shell "mkdir /data/local/rootmp"
-		adb push root/zergRush /data/local/rootmp/.
-		adb shell "chmod 777 /data/local/rootmp/zergRush"
-		echo "Running zergRush exploit."
-		adb shell "./data/local/rootmp/zergRush"
-		echo ""
-		echo "Exploit complete, waiting for device to re-appear."
+		echo "> Preparing for exploit."
+		adb shell "mkdir /data/local/rootmp" >> ./system.log
+		adb push root/zergRush /data/local/rootmp/. >> ./system.log
+		adb shell "chmod 777 /data/local/rootmp/zergRush" >> ./system.log
+		echo "> Running zergRush exploit."
+		adb shell "./data/local/rootmp/zergRush" >> ./system.log
+		echo "> Exploit complete, waiting for device to re-appear."
 		adb wait-for-device
-		echo "Installing BusyBox."
-		adb push root/busybox /data/local/rootmp/.
-		adb shell "chmod 755 /data/local/rootmp/busybox"
-		adb shell "/data/local/rootmp/busybox mount -o remount,rw /system"
-		adb shell "dd if=/data/local/rootmp/busybox of=/system/xbin/busybox"
-		adb shell "chmod 04755 /system/xbin/busybox"
-		adb shell "/system/xbin/busybox --install -s /system/xbin"
-		echo ""
-		echo "Enabling the su (superuser) command."
-		adb push root/su /system/bin/su
-		adb shell "chown 0:0 /system/bin/su"
-		adb shell "chmod 06755 /system/bin/su"
-		adb shell "rm /system/xbin/su"
-		adb shell "ln -s /system/bin/su /system/xbin/su"
-		echo ""
-		echo "Installing Superuser."
-		adb push root/Superuser.apk /system/app/.
-		adb shell "rm -r /data/local/rootmp"
+		echo "> Installing BusyBox."
+		adb push root/busybox /data/local/rootmp/. >> ./system.log
+		adb shell "chmod 755 /data/local/rootmp/busybox" >> ./system.log
+		adb shell "/data/local/rootmp/busybox mount -o remount,rw /system" >> ./system.log
+		adb shell "dd if=/data/local/rootmp/busybox of=/system/xbin/busybox" >> ./system.log
+		adb shell "chmod 04755 /system/xbin/busybox" >> ./system.log
+		adb shell "/system/xbin/busybox --install -s /system/xbin" >> ./system.log
+		echo "> Enabling the su (superuser) command."
+		adb push root/su /system/bin/su >> ./system.log
+		adb shell "chown 0:0 /system/bin/su" >> ./system.log
+		adb shell "chmod 06755 /system/bin/su" >> ./system.log
+		adb shell "rm /system/xbin/su" >> ./system.log
+		adb shell "ln -s /system/bin/su /system/xbin/su" >> ./system.log
+		echo "> Installing Superuser."
+		adb push root/Superuser.apk /system/app/. >> ./system.log
+		adb shell "rm -r /data/local/rootmp" >> ./system.log
 		echo ""
 		echo "Device rooted. Rebooting..."
 		adb reboot
@@ -115,14 +117,14 @@ case "$choice" in
 		apks=($( ls apps/*.apk ))
 		for ((i=0; i<${#apks[@]}; i++))
 		do
-			adb install ${apks[$i]}
+			adb install ${apks[$i]} >> ./system.log
 		done
 		exit
 		;;
 	
 	"r")
 		echo "Rebooting. xfast command will work in fastboot mode."
-		adb reboot bootloader
+		adb reboot bootloader >> ./system.log
 		exit
 		;;
 

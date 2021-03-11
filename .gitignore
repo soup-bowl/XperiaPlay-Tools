@@ -1,3 +1,4 @@
 apps/*.apk
 firmwares/*.ftf
 prepared/
+system.log

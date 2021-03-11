@@ -30,6 +30,11 @@ else
 	exit
 fi
 
+echo "" >> ./system.log
+echo "Starting xfast for $devindt" >> ./system.log
+date >> ./system.log
+echo "---------------" >> ./system.log
+
 # --- Identify user desires ---
 echo "What do you want to do?"
 echo ""
@@ -106,6 +111,10 @@ case "$choice" in
 					;;
 			esac
 
+			echo "Flash mode - choices:" >> ./system.log
+			echo "File: $file" >> ./system.log
+			echo "Mode: $choice" >> ./system.log
+
 			# --- Detect Device ---
 			devindt=`fastboot getvar product 2>&1` # FB writes the response to stderr
 			devindt=`echo $devindt | cut -f2 -d ":" | cut -f2 -d " "`
@@ -117,11 +126,11 @@ case "$choice" in
 				for i in "${commands[@]}"
 				do
 					echo "> fastboot flash $i" 
-					fastboot flash $i
+					fastboot flash $i 2>> ./system.log
 				done
 
 				echo "Flashing complete, rebooting..."
-				fastboot reboot &> /dev/null
+				fastboot reboot 2>> ./system.log
 			else
 				echo "Device identifer was incorrect. Discovered '$devindt'. Expecting R800i, or R800x."
 			fi
