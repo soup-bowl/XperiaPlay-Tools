@@ -1,0 +1,20 @@
+#! /bin/bash
+echo "Detecting tool..."
+
+adb start-server > /dev/null 2>&1
+
+ispluggedfb=`fastboot devices 2>&1`
+ispluggedad=`adb get-state`
+
+# Check for a device in fastboot mode.
+if [[ $ispluggedfb != "" ]]
+then
+	./xfast.sh
+# Check for a device in Android Debugging mode.
+elif [[ $ispluggedad != "" ]]
+then
+	./xdb.sh
+else
+	echo "Could not detect an Android phone in either debugging mode or fastboot."
+	exit 1
+fi
