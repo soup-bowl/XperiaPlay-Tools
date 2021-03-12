@@ -4,9 +4,10 @@
 The correct method for this device is to use **[Flashtool](https://github.com/Androxyde/Flashtool)**, older versions work more effectively with the Xperia PLAY.
 [See this Reddit Wiki](https://www.reddit.com/r/xperiaplay/wiki/index#wiki_flashtool) for the best information.
 
-To begin, open a terminal into the directory and run `./xtools`. This comes pre-rolled with multi-platform **Android Debugging Bridge 1.0.39**.
+## Usage
+**[Download the latest release version](https://github.com/soup-bowl/XperiaPlay-Tools/releases/latest)**. The tool will work on **~~Windows~~, macOS (Intel) and Linux**.
 
-To get a starter subset of files in the development version, run `./dev.sh`. This will grab a selection of R800i firmwares, apps and platform tools.
+To begin, open a terminal into the directory and run `./xtools`. This comes pre-rolled with multi-platform **Android Debugging Bridge 1.0.39**.
 
 ## 🤖 xdb (adb - Android Debugging Bridge)
 This provides interactions with the running firmware. Currently you can:
