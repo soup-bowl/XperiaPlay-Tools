@@ -4,6 +4,10 @@
 The correct method for this device is to use **[Flashtool](https://github.com/Androxyde/Flashtool)**, older versions work more effectively with the Xperia PLAY.
 [See this Reddit Wiki](https://www.reddit.com/r/xperiaplay/wiki/index#wiki_flashtool) for the best information.
 
+To begin, open a terminal into the directory and run `./xtools`.
+
+To get a starter subset of files in the development version, run `./dev.sh`. This will grab a selection of R800i firmwares, apps and platform tools.
+
 ## 🤖 xdb (adb - Android Debugging Bridge)
 This provides interactions with the running firmware. Currently you can:
 * Root the device using zergRush (exploitable firmwares only - based upon [DooMLoRD implementation](https://forum.xda-developers.com/t/04-jan-rooting-unrooting-doomlords-easy-rooting-toolkit-v4-0-zergrush-exploit.1321582/)).
