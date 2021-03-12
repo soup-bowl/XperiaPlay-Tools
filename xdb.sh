@@ -3,6 +3,16 @@ echo "XPlayADB by soup-bowl - Version 0.1-Alpha"
 echo "Works with R800i on Linux-based commands with fastboot."
 echo "-----------------------------"
 
+case "$OSTYPE" in
+	"darwin"*)
+		xadb="./platform-tools/darwin/adb"
+		;;
+
+	*)
+		xadb="adb"
+		;;
+esac
+
 # Trims response from adb shell.
 # Modified from https://stackoverflow.com/a/43432097
 trim()
@@ -18,13 +28,13 @@ trim()
 
 # --- Pre-run tests ---
 # Test for ADB.
-if ! command -v adb > /dev/null 2>&1
+if ! command -v $xadb > /dev/null 2>&1
 then
 	echo "Error: ADB package not found."
 	exit 1
 fi
 
-isplugged=`adb get-state`
+isplugged=`${xadb} get-state`
 if [[ $isplugged == "" ]]
 then
 	echo ""
@@ -35,7 +45,7 @@ then
 	exit 1
 fi
 
-trim $(adb shell getprop ro.product.model) 'device'
+trim $(${xadb} shell getprop ro.product.model) 'device'
 if [[ $device == "R800i" ]]
 then
 	echo "Xperia PLAY $device detected!"
@@ -44,7 +54,7 @@ else
 	exit 1
 fi
 
-isrootcmd=$(adb shell stat /system/bin/su 2>&1)
+isrootcmd=$(${xadb} shell stat /system/bin/su 2>&1)
 if [[ $isrootcmd == *"No such file or"* || $isrootcmd == *"permission den"* ]]
 then
 	echo "Xperia is not rooted (no su detected or permission denied)."
@@ -54,7 +64,8 @@ fi
 
 echo "" >> ./system.log
 echo "Starting xdb for $device" >> ./system.log
-date >> ./system.log
+echo "Using $(${xadb} version) on ${OSTYPE}" >> ./system.log
+echo "Timestamp: $(date)" >> ./system.log
 echo "---------------" >> ./system.log
 
 # --- Identify user desires ---
@@ -76,7 +87,7 @@ case "$choice" in
 		# https://forum.xda-developers.com/t/04-jan-rooting-unrooting-doomlords-easy-rooting-toolkit-v4-0-zergrush-exploit.1321582/
 		# https://forum.xda-developers.com/t/how-to-zergrush-root-root-w-v2-2-x-2-3-x-not-ics-4-x-or-gb-after-11-2011.1312859/
 
-		trim $(adb shell echo true) 'resp'
+		trim $(${xadb} shell echo true) 'resp'
 		if [[ $resp != "true" ]]
 		then
 			echo "Error: Unable to run commands on device. Ensure ONLY the Xperia PLAY is plugged in, and Android Debugging is enabled."
@@ -84,32 +95,32 @@ case "$choice" in
 		fi
 
 		echo "> Preparing for exploit."
-		adb shell "mkdir /data/local/rootmp" >> ./system.log
-		adb push root/zergRush /data/local/rootmp/. >> ./system.log
-		adb shell "chmod 777 /data/local/rootmp/zergRush" >> ./system.log
+		$xadb shell "mkdir /data/local/rootmp" >> ./system.log
+		$xadb push root/zergRush /data/local/rootmp/. >> ./system.log
+		$xadb shell "chmod 777 /data/local/rootmp/zergRush" >> ./system.log
 		echo "> Running zergRush exploit."
-		adb shell "./data/local/rootmp/zergRush" >> ./system.log
+		$xadb shell "./data/local/rootmp/zergRush" >> ./system.log
 		echo "> Exploit complete, waiting for device to re-appear."
-		adb wait-for-device
+		$xadb wait-for-device
 		echo "> Installing BusyBox."
-		adb push root/busybox /data/local/rootmp/. >> ./system.log
-		adb shell "chmod 755 /data/local/rootmp/busybox" >> ./system.log
-		adb shell "/data/local/rootmp/busybox mount -o remount,rw /system" >> ./system.log
-		adb shell "dd if=/data/local/rootmp/busybox of=/system/xbin/busybox" >> ./system.log
-		adb shell "chmod 04755 /system/xbin/busybox" >> ./system.log
-		adb shell "/system/xbin/busybox --install -s /system/xbin" >> ./system.log
+		$xadb push root/busybox /data/local/rootmp/. >> ./system.log
+		$xadb shell "chmod 755 /data/local/rootmp/busybox" >> ./system.log
+		$xadb shell "/data/local/rootmp/busybox mount -o remount,rw /system" >> ./system.log
+		$xadb shell "dd if=/data/local/rootmp/busybox of=/system/xbin/busybox" >> ./system.log
+		$xadb shell "chmod 04755 /system/xbin/busybox" >> ./system.log
+		$xadb shell "/system/xbin/busybox --install -s /system/xbin" >> ./system.log
 		echo "> Enabling the su (superuser) command."
-		adb push root/su /system/bin/su >> ./system.log
-		adb shell "chown 0:0 /system/bin/su" >> ./system.log
-		adb shell "chmod 06755 /system/bin/su" >> ./system.log
-		adb shell "rm /system/xbin/su" >> ./system.log
-		adb shell "ln -s /system/bin/su /system/xbin/su" >> ./system.log
+		$xadb push root/su /system/bin/su >> ./system.log
+		$xadb shell "chown 0:0 /system/bin/su" >> ./system.log
+		$xadb shell "chmod 06755 /system/bin/su" >> ./system.log
+		$xadb shell "rm /system/xbin/su" >> ./system.log
+		$xadb shell "ln -s /system/bin/su /system/xbin/su" >> ./system.log
 		echo "> Installing Superuser."
-		adb push root/Superuser.apk /system/app/. >> ./system.log
-		adb shell "rm -r /data/local/rootmp" >> ./system.log
+		$xadb push root/Superuser.apk /system/app/. >> ./system.log
+		$xadb shell "rm -r /data/local/rootmp" >> ./system.log
 		echo ""
 		echo "Device rooted. Rebooting..."
-		adb reboot
+		$xadb reboot
 		exit
 		;;
 	

@@ -1,4 +1,6 @@
 apps/*.apk
 firmwares/*.ftf
+platform-tools/*
 prepared/
+.DS_Store
 system.log

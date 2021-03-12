@@ -1,10 +1,22 @@
 #! /bin/bash
 echo "Detecting tool..."
 
-adb start-server > /dev/null 2>&1
+case "$OSTYPE" in
+	"darwin"*)
+		xadb="./platform-tools/darwin/adb"
+		fb="./platform-tools/darwin/fastboot"
+		;;
 
-ispluggedfb=`fastboot devices 2>&1`
-ispluggedad=`adb get-state`
+	*)
+		xadb="adb"
+		fb="fastboot"
+		;;
+esac
+
+$xadb start-server > /dev/null 2>&1
+
+ispluggedfb=`{$fb} devices 2>&1`
+ispluggedad=`{$xadb} get-state`
 
 # Check for a device in fastboot mode.
 if [[ $ispluggedfb != "" ]]

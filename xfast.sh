@@ -3,15 +3,25 @@ echo "XPlayFlash by soup-bowl - Version 0.1-Alpha"
 echo "Works with R800i on Linux-based commands with fastboot."
 echo "-----------------------------"
 
+case "$OSTYPE" in
+	"darwin"*)
+		fb="./platform-tools/darwin/fastboot"
+		;;
+
+	*)
+		fb="fastboot"
+		;;
+esac
+
 # --- Pre-run tests ---
 # Test for ADB.
-if ! command -v fastboot > /dev/null 2>&1
+if ! command -v $fb > /dev/null 2>&1
 then
 	echo "Error: ADB package (specifically fastboot) not found."
 	exit 1
 fi
 
-isplugged=`fastboot devices 2>&1`
+isplugged=`${fb} devices 2>&1`
 if [[ $isplugged == "" ]]
 then
 	echo "Fastboot on your system was found, but has detected no connected devices. Please connect your Xperia in fastboot mode first."
@@ -20,7 +30,7 @@ then
 fi
 
 # --- Detect Device ---
-devindt=`fastboot getvar product 2>&1` # FB writes the response to stderr
+devindt=`${fb} getvar product 2>&1` # FB writes the response to stderr
 devindt=`echo $devindt | cut -f2 -d ":" | cut -f2 -d " "`
 if [[ $devindt == "R800i" ]]
 then
@@ -32,7 +42,8 @@ fi
 
 echo "" >> ./system.log
 echo "Starting xfast for $devindt" >> ./system.log
-date >> ./system.log
+echo "Using $(${fb} --version) on ${OSTYPE}" >> ./system.log
+echo "Timestamp: $(date)" >> ./system.log
 echo "---------------" >> ./system.log
 
 # --- Identify user desires ---
@@ -99,9 +110,9 @@ case "$choice" in
 					;;
 
 				"4")
-					if test -f "./prepared/kernel.sin"; then cominpt=`realpath ./prepared/kernel.sin`; commands+=( "boot $cominpt" ); fi
-					if test -f "./prepared/system.sin"; then cominpt=`realpath ./prepared/system.sin`; commands+=( "system $cominpt" ); fi
-					if test -f "./prepared/userdata.sin"; then cominpt=`realpath ./prepared/userdata.sin`; commands+=( "userdata $cominpt" ); fi
+					if test -f "./prepared/kernel.sin"; then cominpt="./prepared/kernel.sin"; commands+=( "boot $cominpt" ); fi
+					if test -f "./prepared/system.sin"; then cominpt="./prepared/system.sin"; commands+=( "system $cominpt" ); fi
+					if test -f "./prepared/userdata.sin"; then cominpt="./prepared/userdata.sin"; commands+=( "userdata $cominpt" ); fi
 					;;
 
 				*)
@@ -116,7 +127,7 @@ case "$choice" in
 			echo "Mode: $choice" >> ./system.log
 
 			# --- Detect Device ---
-			devindt=`fastboot getvar product 2>&1` # FB writes the response to stderr
+			devindt=`${fb} getvar product 2>&1` # FB writes the response to stderr
 			devindt=`echo $devindt | cut -f2 -d ":" | cut -f2 -d " "`
 
 			# --- Fastboot Command Execution ---
@@ -126,11 +137,11 @@ case "$choice" in
 				for i in "${commands[@]}"
 				do
 					echo "> fastboot flash $i" 
-					fastboot flash $i 2>> ./system.log
+					$fb flash $i 2>> ./system.log
 				done
 
 				echo "Flashing complete, rebooting..."
-				fastboot reboot 2>> ./system.log
+				#fastboot reboot 2>> ./system.log
 			else
 				echo "Device identifer was incorrect. Discovered '$devindt'. Expecting R800i, or R800x."
 			fi
@@ -147,7 +158,7 @@ case "$choice" in
 		;;
 
 	"r")
-		fastboot continue
+		$fb continue
 		exit
 		;;
 
