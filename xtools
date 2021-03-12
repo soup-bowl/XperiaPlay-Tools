@@ -20,8 +20,8 @@ esac
 
 $xadb start-server > /dev/null 2>&1
 
-ispluggedfb=`{$fb} devices 2>&1`
-ispluggedad=`{$xadb} get-state`
+ispluggedfb=`${fb} devices 2>&1`
+ispluggedad=`${xadb} get-state`
 
 # Check for a device in fastboot mode.
 if [[ $ispluggedfb != "" ]]
