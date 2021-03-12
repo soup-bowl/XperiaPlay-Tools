@@ -4,6 +4,10 @@ echo "Works with R800i on Linux-based commands with fastboot."
 echo "-----------------------------"
 
 case "$OSTYPE" in
+	"linux"*)
+		xadb="./platform-tools/linux/adb"
+		;;
+
 	"darwin"*)
 		xadb="./platform-tools/darwin/adb"
 		;;

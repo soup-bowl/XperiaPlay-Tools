@@ -4,6 +4,10 @@ echo "Works with R800i on Linux-based commands with fastboot."
 echo "-----------------------------"
 
 case "$OSTYPE" in
+	"linux"*)
+		fb="./platform-tools/linux/fastboot"
+		;;
+
 	"darwin"*)
 		fb="./platform-tools/darwin/fastboot"
 		;;

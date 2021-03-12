@@ -2,6 +2,11 @@
 echo "Detecting tool..."
 
 case "$OSTYPE" in
+	"linux"*)
+		xadb="./platform-tools/linux/adb"
+		fb="./platform-tools/linux/fastboot"
+		;;
+
 	"darwin"*)
 		xadb="./platform-tools/darwin/adb"
 		fb="./platform-tools/darwin/fastboot"
