@@ -7,30 +7,30 @@ case "$OSTYPE" in
 	"linux"*)
 		if [[ $(uname -r) =~ WSL ]]
 		then
-			fb="./platform-tools/windows/fastboot.exe"
+			xfst="./platform-tools/windows/fastboot.exe"
 		else
-			fb="./platform-tools/linux/fastboot"
+			xfst="./platform-tools/linux/fastboot"
 		fi
 		;;
 
 	"darwin"*)
-		fb="./platform-tools/darwin/fastboot"
+		xfst="./platform-tools/darwin/fastboot"
 		;;
 
 	*)
-		fb="fastboot"
+		xfst="fastboot"
 		;;
 esac
 
 # --- Pre-run tests ---
 # Test for ADB.
-if ! command -v $fb > /dev/null 2>&1
+if ! command -v $xfst > /dev/null 2>&1
 then
 	echo "Error: ADB package (specifically fastboot) not found."
 	exit 1
 fi
 
-isplugged=`${fb} devices 2>&1`
+isplugged=`${xfst} devices 2>&1`
 if [[ $isplugged == "" ]]
 then
 	echo "Fastboot on your system was found, but has detected no connected devices. Please connect your Xperia in fastboot mode first."
@@ -39,7 +39,7 @@ then
 fi
 
 # --- Detect Device ---
-devindt=`${fb} getvar product 2>&1` # FB writes the response to stderr
+devindt=`${xfst} getvar product 2>&1` # xfst writes the response to stderr
 devindt=`echo $devindt | cut -f2 -d ":" | cut -f2 -d " "`
 if [[ $devindt == "R800i" ]]
 then
@@ -51,7 +51,7 @@ fi
 
 echo "" >> ./system.log
 echo "Starting xfast for $devindt" >> ./system.log
-echo "Using $(${fb} --version) on ${OSTYPE}" >> ./system.log
+echo "Using $(${xfst} --version) on ${OSTYPE}" >> ./system.log
 echo "Timestamp: $(date)" >> ./system.log
 echo "---------------" >> ./system.log
 
@@ -136,7 +136,7 @@ case "$choice" in
 			echo "Mode: $choice" >> ./system.log
 
 			# --- Detect Device ---
-			devindt=`${fb} getvar product 2>&1` # FB writes the response to stderr
+			devindt=`${xfst} getvar product 2>&1` # xfst writes the response to stderr
 			devindt=`echo $devindt | cut -f2 -d ":" | cut -f2 -d " "`
 
 			# --- Fastboot Command Execution ---
@@ -146,7 +146,7 @@ case "$choice" in
 				for i in "${commands[@]}"
 				do
 					echo "> fastboot flash $i" 
-					$fb flash $i 2>> ./system.log
+					$xfst flash $i 2>> ./system.log
 				done
 
 				echo "Flashing complete, rebooting..."
@@ -167,7 +167,7 @@ case "$choice" in
 		;;
 
 	"r")
-		$fb continue
+		$xfst continue
 		exit
 		;;
 
