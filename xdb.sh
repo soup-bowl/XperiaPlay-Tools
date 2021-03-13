@@ -5,7 +5,12 @@ echo "-----------------------------"
 
 case "$OSTYPE" in
 	"linux"*)
-		xadb="./platform-tools/linux/adb"
+		if [[ $(uname -r) =~ WSL ]]
+		then
+			xadb="./platform-tools/windows/adb.exe"
+		else
+			xadb="./platform-tools/linux/adb"
+		fi
 		;;
 
 	"darwin"*)

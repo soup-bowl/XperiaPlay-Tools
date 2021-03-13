@@ -3,8 +3,14 @@ echo "Detecting tool..."
 
 case "$OSTYPE" in
 	"linux"*)
-		xadb="./platform-tools/linux/adb"
-		fb="./platform-tools/linux/fastboot"
+		if [[ $(uname -r) =~ WSL ]]
+		then
+			xadb="./platform-tools/windows/adb.exe"
+			fb="./platform-tools/windows/fastboot.exe"
+		else
+			xadb="./platform-tools/linux/adb"
+			fb="./platform-tools/linux/fastboot"
+		fi
 		;;
 
 	"darwin"*)

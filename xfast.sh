@@ -5,7 +5,12 @@ echo "-----------------------------"
 
 case "$OSTYPE" in
 	"linux"*)
-		fb="./platform-tools/linux/fastboot"
+		if [[ $(uname -r) =~ WSL ]]
+		then
+			fb="./platform-tools/windows/fastboot.exe"
+		else
+			fb="./platform-tools/linux/fastboot"
+		fi
 		;;
 
 	"darwin"*)
