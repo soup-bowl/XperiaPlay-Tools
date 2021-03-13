@@ -148,9 +148,14 @@ case "$choice" in
 		sep=$'\n' ipt=($(cat removals.txt))
 		for i in $(seq ${#ipt[*]})
 		do
-			echo "${ipt[$i]}"
-			#$xadb shell "su -c 'rm /system/app/${apks[$i]}.apk'"
+			if [[ ${ipt[$i]: -4} == ".apk" ]]
+			then
+				echo "Removing ${ipt[$i]} ..."
+				$xadb shell "su -c 'rm ${ipt[$i]}'" >> ./system.log 2> ./system.log
+			fi
 		done
+		echo "Removals complete - Rebooting..."
+		$xadb reboot >> ./system.log
 		exit
 		;;
 	
