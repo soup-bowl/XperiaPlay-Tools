@@ -1,0 +1,12 @@
+/system/app/Talk2.apk
+/system/app/usersupport.apk
+/system/app/preinstalledservice.apk
+/system/app/SemcMusic.apk
+/system/app/widgetonoff.apk
+/system/app/EventStreamPluginCallLog.apk
+/system/app/SEMCSetupWizard.apk
+/system/app/CustomizationProvider.apk
+/system/app/YouTubeKaraokePlugin.apk
+/system/app/Camera.apk
+/system/app/Sync.apk
+/system/app/Calculator.apk

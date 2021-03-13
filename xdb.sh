@@ -66,9 +66,9 @@ fi
 isrootcmd=$(${xadb} shell stat /system/bin/su 2>&1)
 if [[ $isrootcmd == *"No such file or"* || $isrootcmd == *"permission den"* ]]
 then
-	echo "Xperia is not rooted (no su detected or permission denied)."
+	isroot="ready to root"
 else
-	echo "Xperia appears to be rooted (su detected)."
+	isroot="already rooted"
 fi
 
 echo "" >> ./system.log
@@ -80,8 +80,9 @@ echo "---------------" >> ./system.log
 # --- Identify user desires ---
 echo "What do you want to do?"
 echo ""
-echo "[1] Root device."
-echo "[2] Install apps."
+echo "[1] Root device (${isroot})."
+echo "[2] Install all apps."
+echo "[3] Remove recognised bloatware."
 echo ""
 echo "[r] Reboot into fastboot."
 echo "[q] Cancel."
@@ -137,14 +138,25 @@ case "$choice" in
 		apks=($( ls apps/*.apk ))
 		for ((i=0; i<${#apks[@]}; i++))
 		do
-			adb install ${apks[$i]} >> ./system.log
+			$xadb install -s ${apks[$i]}
+		done
+		exit
+		;;
+	
+	"3")
+		$xadb shell "su -c 'mount -o remount,rw /system /system'"
+		sep=$'\n' ipt=($(cat removals.txt))
+		for i in $(seq ${#ipt[*]})
+		do
+			echo "${ipt[$i]}"
+			#$xadb shell "su -c 'rm /system/app/${apks[$i]}.apk'"
 		done
 		exit
 		;;
 	
 	"r")
 		echo "Rebooting. xfast command will work in fastboot mode."
-		adb reboot bootloader >> ./system.log
+		$xadb reboot bootloader >> ./system.log
 		exit
 		;;
 
