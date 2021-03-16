@@ -82,7 +82,7 @@ echo "What do you want to do?"
 echo ""
 echo "[1] Root device (${isroot})."
 echo "[2] Install all apps."
-echo "[3] Remove recognised bloatware."
+echo "[3] Remove recognised bloatware (experimental - Requires root)."
 echo ""
 echo "[r] Reboot into fastboot."
 echo "[q] Cancel."
@@ -144,19 +144,37 @@ case "$choice" in
 		;;
 	
 	"3")
-		$xadb shell "su -c 'mount -o remount,rw /system /system'"
-		sep=$'\n' ipt=($(cat removals.txt))
-		for i in $(seq ${#ipt[*]})
-		do
-			if [[ ${ipt[$i]: -4} == ".apk" ]]
-			then
-				echo "Removing ${ipt[$i]} ..."
-				$xadb shell "su -c 'rm ${ipt[$i]}'" >> ./system.log 2> ./system.log
-			fi
-		done
-		echo "Removals complete - Rebooting..."
-		$xadb reboot >> ./system.log
-		exit
+		echo "This experimental feature will remove apps determined to be bloatware, or otherwise unnessesary for modern usage."
+		echo "Based upon information found here - https://revive.today/xpapk (cellular)."
+		echo "Further apps can be removed without detrimental effects depending on use, see the document linked above."
+		echo "If you encounter issues, please report them at the GitHub tracker - https://github.com/soup-bowl/XPLAY-Manager."
+		echo "THIS IS REMOVING SYSTEM APPS - BACKUP IMPORTANT DATA BEFORE EXECUTING THIS SCRIPT."
+		echo ""
+		echo "Do you wish to continue?"
+		read -p 'choose [y/N]: ' choice
+
+		commands=()
+		case "$choice" in
+			"y"|"Y")
+				$xadb shell "su -c 'mount -o remount,rw /system /system'"
+				sep=$'\n' ipt=($(cat removals.txt))
+				for i in $(seq ${#ipt[*]})
+				do
+					if [[ ${ipt[$i]: -4} == ".apk" ]]
+					then
+						echo "Removing ${ipt[$i]} ..."
+						$xadb shell "su -c 'rm ${ipt[$i]}'" >> ./system.log 2> ./system.log
+					fi
+				done
+				echo "Removals complete - Rebooting..."
+				$xadb reboot >> ./system.log
+				exit
+				;;
+			*)
+				echo "Exited."
+				exit
+				;;
+		esac
 		;;
 	
 	"r")
