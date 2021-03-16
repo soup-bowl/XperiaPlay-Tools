@@ -150,7 +150,7 @@ case "$choice" in
 				done
 
 				echo "Flashing complete, rebooting..."
-				#fastboot reboot 2>> ./system.log
+				$xfst reboot 2>> ./system.log
 			else
 				echo "Device identifer was incorrect. Discovered '$devindt'. Expecting R800i, or R800x."
 			fi
@@ -167,7 +167,8 @@ case "$choice" in
 		;;
 
 	"r")
-		$xfst continue
+		echo "Rebooting..."
+		$xfst reboot 2>> ./system.log
 		exit
 		;;
 
