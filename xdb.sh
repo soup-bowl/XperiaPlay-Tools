@@ -115,7 +115,14 @@ case "$choice" in
 		echo "> Installing BusyBox."
 		$xadb push root/busybox /data/local/rootmp/. >> ./system.log
 		$xadb shell "chmod 755 /data/local/rootmp/busybox" >> ./system.log
-		$xadb shell "/data/local/rootmp/busybox mount -o remount,rw /system" >> ./system.log
+		diditwork=`${xadb} shell "/data/local/rootmp/busybox mount -o remount,rw /system"` >> ./system.log
+		if [[ $diditwork == *"are you root"* ]]
+		then
+			echo ""
+			echo "Root payload failed to install using zergRush exploit."
+			echo "Flash a compatible exploitable firmware (e.g. R800i_4.0.2.A.0.58_Enhanced.ftf), or look on the XDA forums to find a root solution for your device."
+			exit 1
+		fi
 		$xadb shell "dd if=/data/local/rootmp/busybox of=/system/xbin/busybox" >> ./system.log
 		$xadb shell "chmod 04755 /system/xbin/busybox" >> ./system.log
 		$xadb shell "/system/xbin/busybox --install -s /system/xbin" >> ./system.log
