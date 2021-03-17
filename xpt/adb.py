@@ -3,7 +3,7 @@ import re
 
 class ADB(object):
 	def __init__(self):
-		self.adb = "/home/casey/Projects/XperiaPlay-Tools/platform-tools/linux/adb"
+		self.adb = "./resources/platform-tools/linux/adb"
 		vno = self.get_version()
 		if vno != None:
 			self.available = True

@@ -3,7 +3,7 @@ import re
 
 class Fastboot(object):
 	def __init__(self):
-		self.fastboot = "/home/casey/Projects/XperiaPlay-Tools/platform-tools/linux/fastboot"
+		self.fastboot = "./resources/platform-tools/linux/fastboot"
 		vno = self.get_version()
 		if vno != None:
 			self.available = True
