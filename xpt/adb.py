@@ -5,7 +5,8 @@ from sys import platform
 
 class ADB(object):
 	def __init__(self):
-		self.set_platform_tool()
+		self.adb = "./resources/platform-tools/adb"
+
 		self.rootdir      = "./resources/root/"
 		self.appdir       = "./resources/apps/"
 		self.logfile      = "./system.log"
@@ -17,19 +18,6 @@ class ADB(object):
 			self.start_server()
 		else:
 			self.available = False
-
-	def set_platform_tool(self):
-		"""
-		Sets the Android tools based upon the current platform.
-		"""
-		if platform == "linux" or platform == "linux2":
-			self.adb = "./resources/platform-tools/linux/adb"
-		elif platform == "darwin":
-			self.adb = "./resources/platform-tools/darwin/adb"
-		elif platform == "win32":
-			self.adb = "./resources/platform-tools/windows/adb"
-		else:
-			self.adb = "adb"
 	
 	def is_available(self):
 		"""
