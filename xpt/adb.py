@@ -96,24 +96,24 @@ class ADB(object):
 			return False
 		
 		comms = [
-			[self.adb, "shell", "mkdir /data/local/rootmp"],
+			[self.adb, "shell", "mkdir", "/data/local/rootmp"],
 			[self.adb, "push", self.rootdir + "zergRush", "/data/local/rootmp/."],
-			[self.adb, "shell", "chmod 777 /data/local/rootmp/zergRush"],
+			[self.adb, "shell", "chmod", "777", "/data/local/rootmp/zergRush"],
 			[self.adb, "shell", "./data/local/rootmp/zergRush"],
 			[self.adb, "wait-for-device"],
 			[self.adb, "push", self.rootdir + "busybox", "/data/local/rootmp/."],
-			[self.adb, "shell", "chmod 755 /data/local/rootmp/busybox"],
-			[self.adb, "shell", "/data/local/rootmp/busybox mount -o remount,rw /system"],
-			[self.adb, "shell", "dd if=/data/local/rootmp/busybox of=/system/xbin/busybox"],
-			[self.adb, "shell", "chmod 04755 /system/xbin/busybox"],
-			[self.adb, "shell", "/system/xbin/busybox --install -s /system/xbin"],
+			[self.adb, "shell", "chmod", "755", "/data/local/rootmp/busybox"],
+			[self.adb, "shell", "/data/local/rootmp/busybox", "mount", "-o", "remount,rw", "/system"],
+			[self.adb, "shell", "dd", "if=/data/local/rootmp/busybox", "of=/system/xbin/busybox"],
+			[self.adb, "shell", "chmod", "04755", "/system/xbin/busybox"],
+			[self.adb, "shell", "/system/xbin/busybox", "--install", "-s", "/system/xbin"],
 			[self.adb, "push", self.rootdir + "su", "/system/bin/su"],
-			[self.adb, "shell", "chown 0:0 /system/bin/su"],
-			[self.adb, "shell", "chmod 06755 /system/bin/su"],
-			[self.adb, "shell", "rm /system/xbin/su"],
-			[self.adb, "shell", "ln -s /system/bin/su /system/xbin/su"],
+			[self.adb, "shell", "chown", "0:0", "/system/bin/su"],
+			[self.adb, "shell", "chmod", "06755", "/system/bin/su"],
+			[self.adb, "shell", "rm", "/system/xbin/su"],
+			[self.adb, "shell", "ln", "-s", "/system/bin/su", "/system/xbin/su"],
 			[self.adb, "push", self.rootdir + "Superuser.apk", "/system/app/."],
-			[self.adb, "shell", "rm -r /data/local/rootmp"]
+			[self.adb, "shell", "rm", "-r", "/data/local/rootmp"]
 		]
 
 		for command in comms:
