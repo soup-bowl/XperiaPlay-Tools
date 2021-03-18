@@ -1,7 +1,6 @@
 from xpt import ADB, Fastboot
 from os import listdir
 from os.path import isfile, join
-import cmd
 
 adb      = ADB()
 fastboot = Fastboot()
