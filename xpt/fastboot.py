@@ -18,6 +18,9 @@ class Fastboot(object):
 			self.available = False
 	
 	def set_platform_tool(self):
+		"""
+		Sets the Android tools based upon the current platform.
+		"""
 		if platform == "linux" or platform == "linux2":
 			self.fastboot = "./resources/platform-tools/linux/fastboot"
 		elif platform == "darwin":
@@ -79,8 +82,14 @@ class Fastboot(object):
 		self.device_model = re.findall( "product:\s*(.*?)\\n", model.stderr)[0]
 
 	def reboot_device(self):
+		"""
+		Reboots the device.
+
+		Returns:
+			None: No return.
+		"""
 		if self.device_id == None:
-			return False
+			return None
 		
 		subprocess.run( [self.fastboot, "reboot"] )
 
@@ -143,6 +152,12 @@ class Fastboot(object):
 		return subprocess.run( [self.fastboot, "flash", partition, file], capture_output=True, text=True )
 
 	def _log(self, message):
+		"""
+		Logs the message to the internally specified file.
+
+		Args:
+			message (String): Message.
+		"""
 		f = open(self.logfile, "a")
 		f.write( "[" + str(datetime.utcnow()) + "]: " + str(message) )
 		f.close()

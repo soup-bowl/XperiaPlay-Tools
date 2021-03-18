@@ -19,6 +19,9 @@ class ADB(object):
 			self.available = False
 
 	def set_platform_tool(self):
+		"""
+		Sets the Android tools based upon the current platform.
+		"""
 		if platform == "linux" or platform == "linux2":
 			self.adb = "./resources/platform-tools/linux/adb"
 		elif platform == "darwin":
@@ -29,9 +32,19 @@ class ADB(object):
 			self.adb = "adb"
 	
 	def is_available(self):
+		"""
+		Is the Android debugging package available.
+		"""
 		return self.available
 
 	def get_version(self):
+		"""
+		Gets the active platform tools version.
+
+		Returns:
+			String: Android Debugging Bridge version string.
+			None: No ADB package found.
+		"""
 		try:
 			response = subprocess.run( [self.adb, "version"], capture_output=True, text=True )
 		except:
@@ -40,6 +53,13 @@ class ADB(object):
 		return re.findall( "version\s*([\d.]+)", response.stdout )[0]
 
 	def get_devices_connected(self):
+		"""
+		Gets a list of the connected device serials.
+
+		Returns:
+			Array: The connected device serials.
+			None: No devices were found/responded. 
+		"""
 		devices  = []
 		response = str.splitlines( subprocess.run( [self.adb, "devices"], capture_output=True, text=True ).stdout )
 		if len( response ) == 2:
@@ -54,7 +74,8 @@ class ADB(object):
 		return devices
 
 	def set_device(self, device):
-		"""Set the device to be worked on (get them using get_devices_connected()).
+		"""
+		Set the device to be worked on (get them using get_devices_connected()).
 
 		Args:
 			device (String): Device identifier from Fastboot devices.
@@ -65,10 +86,21 @@ class ADB(object):
 		self.device_model = str.split(model.stdout, "\n")[0]
 
 	def start_server(self):
+		"""
+		Start the adb response server.
+		"""
 		if self.available == True:
 			subprocess.run( [self.adb, "start-server"], capture_output=True )
 	
 	def init_zergrush_root(self):
+		"""
+		Root the currently connected Android device with the zergRush exploit.
+
+		This will install busybox, su binary and Superuser.
+
+		Returns:
+			Boolean: Success status (false also returned if no device connected).
+		"""
 		if self.device_id == None:
 			return False
 		
@@ -97,10 +129,21 @@ class ADB(object):
 			response = subprocess.run( command, capture_output=True, text=True )
 			if not response.stdout: self._log(response.stdout)
 			if not response.stderr: self._log(response.stderr)
+		
+		return True
 
 	def reboot_device(self, into_fastboot = False):
+		"""
+		Reboots the device.
+
+		Args:
+			into_fastboot (bool, optional): Boot into fastboot. Defaults to False.
+
+		Returns:
+			None: No return.
+		"""
 		if self.device_id == None:
-			return False
+			return None
 		
 		extra = ""
 		if into_fastboot:
@@ -109,6 +152,12 @@ class ADB(object):
 		subprocess.run( [self.adb, "reboot", extra] )
 
 	def _log(self, message):
+		"""
+		Logs the message to the internally specified file.
+
+		Args:
+			message (String): Message.
+		"""
 		if not self.logfile:
 			f = open(self.logfile, "a")
 			f.write( "[" + str(datetime.utcnow()) + "]: " + str(message) )
