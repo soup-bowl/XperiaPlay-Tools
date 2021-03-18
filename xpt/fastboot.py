@@ -7,9 +7,10 @@ import datetime
 
 class Fastboot(object):
 	def __init__(self):
-		self.fastboot = "./resources/platform-tools/linux/fastboot"
-		self.logfile = "./system.log"
-		self.device   = None
+		self.fastboot     = "./resources/platform-tools/linux/fastboot"
+		self.logfile      = "./system.log"
+		self.device_id    = None
+		self.device_model = None
 		vno = self.get_version()
 		if vno != None:
 			self.available = True
@@ -62,10 +63,13 @@ class Fastboot(object):
 		Args:
 			device (String): Device identifier from Fastboot devices.
 		"""
-		self.device = device
+		self.device_id = device
+
+		model = subprocess.run( [self.fastboot, "getvar", "product"], capture_output=True, text=True )
+		self.device_model = re.findall( "product:\s*(.*?)\\n", model.stderr)[0]
 
 	def reboot_device(self):
-		if self.device == None:
+		if self.device_id == None:
 			return False
 		
 		subprocess.run( [self.fastboot, "reboot"] )
@@ -80,7 +84,7 @@ class Fastboot(object):
 		Returns:
 			Boolean: Success status.
 		"""
-		if self.device == None:
+		if self.device_id == None:
 			return False
 		
 		fmode = []
@@ -123,7 +127,7 @@ class Fastboot(object):
 		Returns:
 			[type]: [description]
 		"""
-		if self.device == None:
+		if self.device_id == None:
 			return None
 		
 		return subprocess.run( [self.fastboot, "flash", partition, file], capture_output=True, text=True )

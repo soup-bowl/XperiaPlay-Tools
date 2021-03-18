@@ -4,11 +4,12 @@ import datetime
 
 class ADB(object):
 	def __init__(self):
-		self.adb     = "./resources/platform-tools/linux/adb"
-		self.rootdir = "./resources/root/"
-		self.appdir  = "./resources/apps/"
-		self.logfile = "./system.log"
-		self.device  = None
+		self.adb          = "./resources/platform-tools/linux/adb"
+		self.rootdir      = "./resources/root/"
+		self.appdir       = "./resources/apps/"
+		self.logfile      = "./system.log"
+		self.device_id    = None
+		self.device_model = None
 		vno = self.get_version()
 		if vno != None:
 			self.available = True
@@ -47,14 +48,17 @@ class ADB(object):
 		Args:
 			device (String): Device identifier from Fastboot devices.
 		"""
-		self.device = device
+		self.device_id = device
+
+		model = subprocess.run( [self.adb, "shell", "getprop", "ro.product.model"], capture_output=True, text=True )
+		self.device_model = str.split(model.stdout, "\n")[0]
 
 	def start_server(self):
 		if self.available == True:
 			subprocess.run( [self.adb, "start-server"], capture_output=True )
 	
 	def init_zergrush_root(self):
-		if self.device == None:
+		if self.device_id == None:
 			return False
 		
 		a = subprocess.run( [self.adb, "shell", "mkdir /data/local/rootmp"], capture_output=True )
@@ -83,7 +87,7 @@ class ADB(object):
 		self.reboot_device()
 
 	def reboot_device(self, into_fastboot = False):
-		if self.device == None:
+		if self.device_id == None:
 			return False
 		
 		extra = ""

@@ -6,14 +6,13 @@ from os.path import isfile, join
 adb      = ADB()
 fastboot = Fastboot()
 
-print("Which do you want?")
-print("")
-print("[1] Xperia Tools.")
-print("[2] Xperia Flash.")
-print("")
-choice = input("Select one: ")
+mode = 0
+if adb.get_devices_connected() != None:
+	mode = 1
+elif fastboot.get_devices_connected() != None:
+	mode = 2
 
-if choice == "1":
+if mode == 1:
 	adb.set_device( adb.get_devices_connected()[0] )
 	print("What do you want to do?")
 	print("")
@@ -36,7 +35,7 @@ if choice == "1":
 		adb.reboot_device(True)
 	else:
 		print("Exited.")
-elif choice == "2":
+elif mode == 2:
 	fastboot.set_device( fastboot.get_devices_connected()[0] )
 	print("What do you want to do?")
 	print("")
@@ -81,9 +80,8 @@ elif choice == "2":
 		else:
 			print("Exited.")
 	elif choice == "r":
-		print("Rebooting...")
 		fastboot.reboot_device()
 	else:
 		print("Exited.")
 else:
-	print("Exited.")
+	print("Could not find an Android device in either ADB or Fastboot status. Exited.")

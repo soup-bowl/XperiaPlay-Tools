@@ -3,6 +3,7 @@ resources/apps/*.apk
 resources/firmwares/*.ftf
 resources/platform-tools/*
 prepared/
+system.log
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
