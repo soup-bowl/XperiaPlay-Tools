@@ -3,10 +3,11 @@ import re
 import tempfile
 import zipfile
 import datetime
+from sys import platform
 
 class Fastboot(object):
 	def __init__(self):
-		self.fastboot     = "./resources/platform-tools/linux/fastboot"
+		self.set_platform_tool()
 		self.logfile      = "./system.log"
 		self.device_id    = None
 		self.device_model = None
@@ -15,6 +16,16 @@ class Fastboot(object):
 			self.available = True
 		else:
 			self.available = False
+	
+	def set_platform_tool(self):
+		if platform == "linux" or platform == "linux2":
+			self.fastboot = "./resources/platform-tools/linux/fastboot"
+		elif platform == "darwin":
+			self.fastboot = "./resources/platform-tools/darwin/fastboot"
+		elif platform == "win32":
+			self.fastboot = "./resources/platform-tools/windows/fastboot"
+		else:
+			self.fastboot = "fastboot"
 	
 	def is_available(self):
 		"""For checking if Fastboot is available on the system.

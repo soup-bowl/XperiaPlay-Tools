@@ -1,10 +1,11 @@
 import subprocess
 import re
 import datetime
+from sys import platform
 
 class ADB(object):
 	def __init__(self):
-		self.adb          = "./resources/platform-tools/linux/adb"
+		self.set_platform_tool()
 		self.rootdir      = "./resources/root/"
 		self.appdir       = "./resources/apps/"
 		self.logfile      = "./system.log"
@@ -16,6 +17,16 @@ class ADB(object):
 			self.start_server()
 		else:
 			self.available = False
+
+	def set_platform_tool(self):
+		if platform == "linux" or platform == "linux2":
+			self.adb = "./resources/platform-tools/linux/adb"
+		elif platform == "darwin":
+			self.adb = "./resources/platform-tools/darwin/adb"
+		elif platform == "win32":
+			self.adb = "./resources/platform-tools/windows/adb"
+		else:
+			self.adb = "adb"
 	
 	def is_available(self):
 		return self.available
@@ -61,30 +72,31 @@ class ADB(object):
 		if self.device_id == None:
 			return False
 		
-		a = subprocess.run( [self.adb, "shell", "mkdir /data/local/rootmp"], capture_output=True )
-		b = subprocess.run( [self.adb, "push", self.rootdir + "zergRush", "/data/local/rootmp/."], capture_output=True )
-		c = subprocess.run( [self.adb, "shell", "chmod 777 /data/local/rootmp/zergRush"], capture_output=True )
-		d = subprocess.run( [self.adb, "shell", "./data/local/rootmp/zergRush"], capture_output=True )
+		comms = [
+			[self.adb, "shell", "mkdir /data/local/rootmp"],
+			[self.adb, "push", self.rootdir + "zergRush", "/data/local/rootmp/."],
+			[self.adb, "shell", "chmod 777 /data/local/rootmp/zergRush"],
+			[self.adb, "shell", "./data/local/rootmp/zergRush"],
+			[self.adb, "wait-for-device"],
+			[self.adb, "push", self.rootdir + "busybox", "/data/local/rootmp/."],
+			[self.adb, "shell", "chmod 755 /data/local/rootmp/busybox"],
+			[self.adb, "shell", "/data/local/rootmp/busybox mount -o remount,rw /system"],
+			[self.adb, "shell", "dd if=/data/local/rootmp/busybox of=/system/xbin/busybox"],
+			[self.adb, "shell", "chmod 04755 /system/xbin/busybox"],
+			[self.adb, "shell", "/system/xbin/busybox --install -s /system/xbin"],
+			[self.adb, "push", self.rootdir + "su", "/system/bin/su"],
+			[self.adb, "shell", "chown 0:0 /system/bin/su"],
+			[self.adb, "shell", "chmod 06755 /system/bin/su"],
+			[self.adb, "shell", "rm /system/xbin/su"],
+			[self.adb, "shell", "ln -s /system/bin/su /system/xbin/su"],
+			[self.adb, "push", self.rootdir + "Superuser.apk", "/system/app/."],
+			[self.adb, "shell", "rm -r /data/local/rootmp"]
+		]
 
-		e = subprocess.run( [self.adb, "wait-for-device"], capture_output=True )
-
-		f = subprocess.run( [self.adb, "push", self.rootdir + "busybox", "/data/local/rootmp/."], capture_output=True )
-		g = subprocess.run( [self.adb, "shell", "chmod 755 /data/local/rootmp/busybox"], capture_output=True )
-		i = subprocess.run( [self.adb, "shell", "/data/local/rootmp/busybox mount -o remount,rw /system"], capture_output=True )
-		j = subprocess.run( [self.adb, "shell", "dd if=/data/local/rootmp/busybox of=/system/xbin/busybox"], capture_output=True )
-		k = subprocess.run( [self.adb, "shell", "chmod 04755 /system/xbin/busybox"], capture_output=True )
-		l = subprocess.run( [self.adb, "shell", "/system/xbin/busybox --install -s /system/xbin"], capture_output=True )
-		
-		m = subprocess.run( [self.adb, "push", self.rootdir + "su", "/system/bin/su"], capture_output=True )
-		n = subprocess.run( [self.adb, "shell", "chown 0:0 /system/bin/su"], capture_output=True )
-		o = subprocess.run( [self.adb, "shell", "chmod 06755 /system/bin/su"], capture_output=True )
-		p = subprocess.run( [self.adb, "shell", "rm /system/xbin/su"], capture_output=True )
-		q = subprocess.run( [self.adb, "shell", "ln -s /system/bin/su /system/xbin/su"], capture_output=True )
-
-		r = subprocess.run( [self.adb, "push", self.rootdir + "Superuser.apk", "/system/app/."], capture_output=True )
-		s = subprocess.run( [self.adb, "shell", "rm -r /data/local/rootmp"], capture_output=True )
-
-		self.reboot_device()
+		for command in comms:
+			response = subprocess.run( command, capture_output=True, text=True )
+			if not response.stdout: self._log(response.stdout)
+			if not response.stderr: self._log(response.stderr)
 
 	def reboot_device(self, into_fastboot = False):
 		if self.device_id == None:
@@ -97,6 +109,7 @@ class ADB(object):
 		subprocess.run( [self.adb, "reboot", extra] )
 
 	def _log(self, message):
-		f = open(self.logfile, "a")
-		f.write( "[" + str(datetime.utcnow()) + "]: " + str(message) )
-		f.close()
+		if not self.logfile:
+			f = open(self.logfile, "a")
+			f.write( "[" + str(datetime.utcnow()) + "]: " + str(message) )
+			f.close()
