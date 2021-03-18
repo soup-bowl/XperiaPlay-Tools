@@ -1,2 +1,8 @@
 #! /bin/bash
+if ! command -v python3 > /dev/null 2>&1
+then
+	echo "Error: Please install Python3 for this tool to work."
+	exit 1
+fi
+
 python3 ./main.py
