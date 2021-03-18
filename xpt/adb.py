@@ -66,7 +66,7 @@ class ADB(object):
 		c = subprocess.run( [self.adb, "shell", "chmod 777 /data/local/rootmp/zergRush"], capture_output=True )
 		d = subprocess.run( [self.adb, "shell", "./data/local/rootmp/zergRush"], capture_output=True )
 
-		e = subprocess.run( [self.adb, "shell", "wait-for-device"], capture_output=True )
+		e = subprocess.run( [self.adb, "wait-for-device"], capture_output=True )
 
 		f = subprocess.run( [self.adb, "push", self.rootdir + "busybox", "/data/local/rootmp/."], capture_output=True )
 		g = subprocess.run( [self.adb, "shell", "chmod 755 /data/local/rootmp/busybox"], capture_output=True )

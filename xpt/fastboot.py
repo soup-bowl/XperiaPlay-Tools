@@ -1,6 +1,5 @@
 import subprocess
 import re
-import pathlib
 import tempfile
 import zipfile
 import datetime

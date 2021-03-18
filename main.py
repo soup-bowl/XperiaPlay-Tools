@@ -1,7 +1,7 @@
 from xpt import ADB, Fastboot
-import cmd
 from os import listdir
 from os.path import isfile, join
+import cmd
 
 adb      = ADB()
 fastboot = Fastboot()
@@ -14,6 +14,7 @@ elif fastboot.get_devices_connected() != None:
 
 if mode == 1:
 	adb.set_device( adb.get_devices_connected()[0] )
+	print("Detected Xperia PLAY " + adb.device_model + " in Android Debugging mode.")
 	print("What do you want to do?")
 	print("")
 	print("[1] Root device.")
@@ -37,6 +38,7 @@ if mode == 1:
 		print("Exited.")
 elif mode == 2:
 	fastboot.set_device( fastboot.get_devices_connected()[0] )
+	print("Detected Xperia PLAY " + fastboot.device_model + " in fastboot mode.")
 	print("What do you want to do?")
 	print("")
 	print("[1] Flash firmware.")
