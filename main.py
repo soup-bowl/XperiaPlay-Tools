@@ -1,7 +1,89 @@
 from xpt import ADB, Fastboot
+import cmd
+from os import listdir
+from os.path import isfile, join
 
-bob = ADB()
-jim = Fastboot()
-print(bob.is_available())
-print(bob.get_version())
-print(jim.get_version())
+adb      = ADB()
+fastboot = Fastboot()
+
+print("Which do you want?")
+print("")
+print("[1] Xperia Tools.")
+print("[2] Xperia Flash.")
+print("")
+choice = input("Select one: ")
+
+if choice == "1":
+	adb.set_device( adb.get_devices_connected()[0] )
+	print("What do you want to do?")
+	print("")
+	print("[1] Root device.")
+	print("[2] Install all apps.")
+	print("[3] Remove recognised bloatware (experimental - Requires root).")
+	print("")
+	print("[r] Reboot device ([f] into fastboot).")
+	print("[q] Cancel.")
+	print("")
+	choice = input("Select one: ")
+
+	if choice == "1":
+		adb.init_zergrush_root()
+	elif choice == "r":
+		print("Rebooting...")
+		adb.reboot_device()
+	elif choice == "f":
+		print("Rebooting into bootloader...")
+		adb.reboot_device(True)
+	else:
+		print("Exited.")
+elif choice == "2":
+	fastboot.set_device( fastboot.get_devices_connected()[0] )
+	print("What do you want to do?")
+	print("")
+	print("[1] Flash firmware.")
+	print("")
+	print("[r] Reboot device.")
+	print("[q] Cancel.")
+	print("")
+	choice = input("Select one: ")
+
+	if choice == "1":
+		print("Select firmware?")
+		print("")
+		path = "./resources/firmwares"
+		ftfs = [f for f in listdir(path) if isfile(join(path, f))]
+		for index, ftf in enumerate(ftfs, start=0):
+			print("[" + str(index) + "] " + ftf + ".")
+		print("")
+		print("[q] Quit.")
+		choice_fw = input("Select one: ")
+		
+		try:
+			fw = ftfs[int(choice_fw)]
+			print(fw)
+		except (IndexError, ValueError) as e:
+			print("Firmware invalid or opted to quit - exited.")
+			exit()
+
+		print("What level of flash do you want?")
+		print("This tool will not interact with baseband, please use flashtool for a complete flash instead.")
+		print("")
+		print("[1] Flash kernel.")
+		print("[2] Flash system.")
+		print("[3] Flash kernel + system.")
+		print("[4] Complete flash.")
+		print("[q] Cancel.")
+		print("")
+		choice = input("Select one: ")
+		if choice == "1" or choice == "2" or choice == "3" or choice == "4":
+			fastboot.flash_ftf( "./resources/firmwares/" + fw, int(choice) )
+			fastboot.reboot_device()
+		else:
+			print("Exited.")
+	elif choice == "r":
+		print("Rebooting...")
+		fastboot.reboot_device()
+	else:
+		print("Exited.")
+else:
+	print("Exited.")
