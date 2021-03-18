@@ -2,7 +2,7 @@ import subprocess
 import re
 import tempfile
 import zipfile
-import datetime
+from datetime import datetime
 from sys import platform
 
 class Fastboot(object):
@@ -15,6 +15,7 @@ class Fastboot(object):
 		vno = self.get_version()
 		if vno != None:
 			self.available = True
+			self._log("Initating Fastboot, using " + self.get_version() + " found at " + self.fastboot + " on " + platform)
 		else:
 			self.available = False
 	
@@ -68,6 +69,8 @@ class Fastboot(object):
 
 		model = subprocess.run( [self.fastboot, "getvar", "product"], capture_output=True, text=True )
 		self.device_model = re.findall( "product:\s*(.*?)\\n", model.stderr)[0]
+
+		self._log("Fastboot device set as " + self.device_model)
 
 	def reboot_device(self):
 		"""
@@ -146,6 +149,7 @@ class Fastboot(object):
 		Args:
 			message (String): Message.
 		"""
-		f = open(self.logfile, "a")
-		f.write( "[" + str(datetime.utcnow()) + "]: " + str(message) )
-		f.close()
+		if self.logfile != False and message != "":
+			f = open(self.logfile, "a")
+			f.write( "\n[" + str(datetime.utcnow()) + "]: " + str(message) )
+			f.close()

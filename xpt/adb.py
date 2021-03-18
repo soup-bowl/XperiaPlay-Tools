@@ -1,6 +1,6 @@
 import subprocess
 import re
-import datetime
+from datetime import datetime
 from sys import platform
 
 class ADB(object):
@@ -16,6 +16,7 @@ class ADB(object):
 		if vno != None:
 			self.available = True
 			self.start_server()
+			self._log("Initating ADB, using " + self.get_version() + " found at " + self.adb + " on " + platform)
 		else:
 			self.available = False
 	
@@ -73,6 +74,8 @@ class ADB(object):
 		model = subprocess.run( [self.adb, "shell", "getprop", "ro.product.model"], capture_output=True, text=True )
 		self.device_model = str.split(model.stdout, "\n")[0]
 
+		self._log("ADB device set as " + self.device_model)
+
 	def start_server(self):
 		"""
 		Start the adb response server.
@@ -115,8 +118,10 @@ class ADB(object):
 
 		for command in comms:
 			response = subprocess.run( command, capture_output=True, text=True )
-			if not response.stdout: self._log(response.stdout)
-			if not response.stderr: self._log(response.stderr)
+			if response.stdout != "": self._log(response.stdout)
+			if response.stderr != "": self._log(response.stderr)
+		
+		self.reboot_device()
 		
 		return True
 
@@ -138,6 +143,17 @@ class ADB(object):
 			extra = "bootloader"
 
 		subprocess.run( [self.adb, "reboot", extra] )
+	
+	def device_is_rooted(self):
+		response = subprocess.run( [self.adb, "shell", "stat", "/system/bin/su"], capture_output=True, text=True )
+		#if "Size: 22" in response.stdout:
+		#	return True;
+		if "No such file or" in response.stdout:
+			return False;
+		elif "permission denied" in response.stdout:
+			return False;
+		else:
+			return True;
 
 	def _log(self, message):
 		"""
@@ -146,7 +162,7 @@ class ADB(object):
 		Args:
 			message (String): Message.
 		"""
-		if not self.logfile:
+		if self.logfile != False and message != "":
 			f = open(self.logfile, "a")
-			f.write( "[" + str(datetime.utcnow()) + "]: " + str(message) )
+			f.write( "\n[" + str(datetime.utcnow()) + "]: " + str(message) )
 			f.close()

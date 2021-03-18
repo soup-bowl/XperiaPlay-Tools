@@ -16,7 +16,10 @@ if mode == 1:
 	print("Detected Xperia PLAY " + adb.device_model + " in Android Debugging mode.")
 	print("What do you want to do?")
 	print("")
-	print("[1] Root device.")
+	if adb.device_is_rooted():
+		print("[-] Device is rooted.")
+	else:
+		print("[1] Root device.")
 	print("[2] Install all apps.")
 	print("[3] Remove recognised bloatware (experimental - Requires root).")
 	print("")
@@ -26,7 +29,12 @@ if mode == 1:
 	choice = input("Select one: ")
 
 	if choice == "1":
+		if adb.device_is_rooted():
+			print("Device is already rooted. Exiting.")
+			exit()
+		print("Rooting device using the zergRush method.")
 		adb.init_zergrush_root()
+		print("Done. Rebooting...")
 	elif choice == "r":
 		print("Rebooting...")
 		adb.reboot_device()
