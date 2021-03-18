@@ -151,5 +151,5 @@ class Fastboot(object):
 		"""
 		if self.logfile != False and message != "":
 			f = open(self.logfile, "a")
-			f.write( "\n[" + str(datetime.utcnow()) + "]: " + str(message) )
+			f.write( "\n[" + str(datetime.utcnow()) + "]: " + str(message).strip() )
 			f.close()

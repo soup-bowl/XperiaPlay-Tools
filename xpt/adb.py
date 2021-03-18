@@ -146,8 +146,7 @@ class ADB(object):
 	
 	def device_is_rooted(self):
 		response = subprocess.run( [self.adb, "shell", "stat", "/system/bin/su"], capture_output=True, text=True )
-		#if "Size: 22" in response.stdout:
-		#	return True;
+
 		if "No such file or" in response.stdout:
 			return False;
 		elif "permission denied" in response.stdout:
@@ -164,5 +163,5 @@ class ADB(object):
 		"""
 		if self.logfile != False and message != "":
 			f = open(self.logfile, "a")
-			f.write( "\n[" + str(datetime.utcnow()) + "]: " + str(message) )
+			f.write( "\n[" + str(datetime.utcnow()) + "]: " + str(message).strip() )
 			f.close()
