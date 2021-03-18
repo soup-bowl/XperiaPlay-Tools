@@ -2,6 +2,7 @@ import subprocess
 import re
 import tempfile
 import zipfile
+from os.path import isfile, join
 from datetime import datetime
 from sys import platform
 
@@ -114,6 +115,7 @@ class Fastboot(object):
 
 		with tempfile.TemporaryDirectory() as dirpath:
 			with zipfile.ZipFile(file, 'r') as zip_ref:
+				self._log("Flash executed - File: " + file + "; Mode: " + str(mode))
 				zip_ref.extractall(dirpath)
 				
 				for partiton in fmode:
@@ -139,8 +141,14 @@ class Fastboot(object):
 		"""
 		if self.device_id == None:
 			return None
-		
-		return subprocess.run( [self.fastboot, "flash", partition, file], capture_output=True, text=True )
+
+		if isfile(file):		
+			response = subprocess.run( [self.fastboot, "flash", partition, file], capture_output=True, text=True )
+			if response.stdout != "": self._log(response.stdout)
+			if response.stderr != "": self._log(response.stderr)
+		else:
+			self._log("Could not find " + file + " for " + str(partition) + " flash - skipping.")
+			return None
 
 	def _log(self, message):
 		"""
