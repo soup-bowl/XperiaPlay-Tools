@@ -1,10 +1,13 @@
-from xpt import ADB, Fastboot, Download
+from xpt import ADB, Fastboot, Download, __version__
 from os import listdir
 from os.path import isfile, join
 
 def call():
 	"""Triggers the guided xtools process, running through both Android Debugging and Fastboot.
 	"""
+
+	print("Xperia Play Tools by soup-bowl - Version " + __version__)
+
 	adb      = ADB()
 	fastboot = Fastboot()
 
