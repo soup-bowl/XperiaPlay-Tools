@@ -1,6 +1,7 @@
 from xpt.com import Com
 from datetime import datetime
 from sys import platform
+from typing import Union
 import re
 import glob
 
@@ -22,12 +23,11 @@ class ADB(Com):
 		else:
 			self.available = False
 
-	def get_version(self):
+	def get_version(self) -> Union[str, None]:
 		"""Gets the active platform tools version.
 
 		Returns:
-			String: Android Debugging Bridge version string.
-			None: No ADB package found.
+			Union[str, None]: Android Debugging Bridge version string.
 		"""
 		try:
 			response = self.run( [self.adb, "version"] )
@@ -37,12 +37,11 @@ class ADB(Com):
 
 		return re.findall( "version\s*([\d.]+)", response.stdout )[0]
 
-	def get_devices_connected(self):
+	def get_devices_connected(self) -> Union[list, None]:
 		"""Gets a list of the connected device serials.
 
 		Returns:
-			Array: The connected device serials.
-			None: No devices were found/responded. 
+			Union[list, None]: The connected device serials, or None if no response.
 		"""
 		devices  = []
 		response = str.splitlines( self.run( [self.adb, "devices"] ).stdout )
@@ -59,19 +58,19 @@ class ADB(Com):
 		self._log(str(len(devices)) + " adb devices found.")
 		return devices
 
-	def get_app_count(self):
+	def get_app_count(self) -> int:
 		"""Counts the apps in the app directory.
 
 		Returns:
-			Int: Count of all files ending with .apk.
+			int: Count of all files ending with .apk.
 		"""
 		return len(glob.glob1(self.appdir,"*.apk"))
 
-	def set_device(self, device):
+	def set_device(self, device) -> None:
 		"""Set the device to be worked on (get them using get_devices_connected()).
 
 		Args:
-			device (String): Device identifier from Fastboot devices.
+			device (str): Device identifier from Fastboot devices.
 		"""
 		self.device_id = device
 
@@ -84,20 +83,20 @@ class ADB(Com):
 
 		self._log("ADB device set as " + self.device_model)
 
-	def start_server(self):
+	def start_server(self) -> None:
 		"""Start the adb response server.
 		"""
 		if self.available == True:
 			self.run( [self.adb, "start-server"] )
 			self._log("Starting up the Android Debugging Bridge server.")
 	
-	def init_zergrush_root(self):
+	def init_zergrush_root(self) -> bool:
 		"""Root the currently connected Android device with the zergRush exploit.
 
 		This will install busybox, su binary and Superuser.
 
 		Returns:
-			Boolean: Success status (false also returned if no device connected).
+			bool: Success status (false also returned if no device connected).
 		"""
 		if self.device_id == None:
 			return False
@@ -130,7 +129,7 @@ class ADB(Com):
 		
 		return True
 
-	def install_all_apps(self):
+	def install_all_apps(self) -> None:
 		"""Installs all apks in the app directory.
 		"""
 		apks = glob.glob(self.appdir + '*.apk')
@@ -138,7 +137,7 @@ class ADB(Com):
 			self._log("Installing app: " + apk)
 			self.install_apk(apk)
 	
-	def install_apk(self, file):
+	def install_apk(self, file) -> None:
 		"""Installs the specified APK file.
 
 		Args:
@@ -154,11 +153,11 @@ class ADB(Com):
 		else:
 			return False
 
-	def mount_system(self):
+	def mount_system(self) -> bool:
 		"""Mounts the system directory as rewritable for root operations.
 
 		Returns:
-			Boolean: Success status. The self.system_is_rw is modified to reflect.
+			bool: Success status. The self.system_is_rw is modified to reflect.
 		"""
 		response = self.run( [self.adb, "shell", "su", "-c", "'mount -o remount,rw /system /system'"] )
 
@@ -168,14 +167,14 @@ class ADB(Com):
 		else:
 			return False
 	
-	def remove_system_app(self, file):
+	def remove_system_app(self, file) -> bool:
 		"""Removes an app by directly removing it.
 
 		Args:
-			file (String): Full filepath to remove.
+			file (str): Full filepath to remove.
 
 		Returns:
-			Boolean: Always returns true.
+			bool: Always returns true.
 		"""
 		if self.system_is_rw == False:
 			self.mount_system()
@@ -184,14 +183,11 @@ class ADB(Com):
 
 		return True
 
-	def reboot_device(self, into_fastboot = False):
+	def reboot_device(self, into_fastboot = False) -> None:
 		"""Reboots the device.
 
 		Args:
 			into_fastboot (bool, optional): Boot into fastboot. Defaults to False.
-
-		Returns:
-			None: No return.
 		"""
 		if self.device_id == None:
 			return None
@@ -202,11 +198,11 @@ class ADB(Com):
 
 		self.run( [self.adb, "reboot", extra] )
 	
-	def device_is_rooted(self):
+	def device_is_rooted(self) -> bool:
 		"""Checks if the device has been rooted.
 
 		Returns:
-			Boolean: Whether the device is rooted or not.
+			bool: Whether the device is rooted or not.
 		"""
 		response = self.run( [self.adb, "shell", "stat", "/system/bin/su"] )
 

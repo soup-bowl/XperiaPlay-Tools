@@ -2,6 +2,7 @@ from xpt import Com
 from os.path import isfile, join
 from sys import platform
 from subprocess import TimeoutExpired
+from typing import Union
 import re
 import tempfile
 import zipfile
@@ -20,13 +21,11 @@ class Fastboot(Com):
 		else:
 			self.available = False
 
-	def get_version(self):
+	def get_version(self) -> Union[str, None]:
 		"""Checks the Fastboot version.
 
 		Returns:
-			string: The version number.
-			None: Problem encountered trying to reach the executable.
-
+			Union[str, None]: The version number, or a problem encountered trying to reach the executable.
 		"""
 		try:
 			response = self.run( [self.fastboot, "--version"] )
@@ -36,12 +35,11 @@ class Fastboot(Com):
 
 		return re.findall( "version\s*(.*)", str.splitlines( response.stdout)[0] )[0]
 	
-	def get_devices_connected(self):
+	def get_devices_connected(self) -> Union[list, None]:
 		"""Gets the currently connected Android devices in Fastboot.
 
 		Returns:
-			Array: A list of Fastboot identifiers.
-			None: No device connected/detected.
+			Union[list, None]: A list of Fastboot identifiers, or nothing.
 		"""
 		devices  = []
 		response = str.splitlines( self.run( [self.fastboot, "devices"] ).stdout )
@@ -55,11 +53,11 @@ class Fastboot(Com):
 		self._log(str(len(devices)) + " fastboot devices found.")
 		return devices
 
-	def set_device(self, device):
+	def set_device(self, device) -> None:
 		"""Set the device to be worked on (get them using get_devices_connected()).
 
 		Args:
-			device (String): Device identifier from Fastboot devices.
+			device (str): Device identifier from Fastboot devices.
 		"""
 		self.device_id = device
 
@@ -73,26 +71,23 @@ class Fastboot(Com):
 
 		self._log("Fastboot device set as " + self.device_model)
 
-	def reboot_device(self):
+	def reboot_device(self) -> None:
 		"""Reboots the device.
-
-		Returns:
-			None: No return.
 		"""
 		if self.device_id == None:
 			return None
 		
 		self.run( [self.fastboot, "reboot"] )
 
-	def flash_ftf(self, file, mode):
+	def flash_ftf(self, file, mode) -> bool:
 		"""Flashes a sin file to the active fastboot device.
 
 		Args:
-			file (String): Location of sin file (will be extracted to TMP).
-			mode (Int): 1 for boot, 2 for system, 3 for both, 4 for entire.
+			file (str): Location of sin file (will be extracted to TMP).
+			mode (int): 1 for boot, 2 for system, 3 for both, 4 for entire.
 
 		Returns:
-			Boolean: Success status.
+			bool: Success status.
 		"""
 		if self.device_id == None:
 			return False
@@ -128,15 +123,12 @@ class Fastboot(Com):
 		return True
 
 
-	def _flash_firmware(self, file, partition):
+	def _flash_firmware(self, file, partition) -> None:
 		"""Flashes the specified file to the partition.
 
 		Args:
-			file (String): Path directly to the desired .sin or .img file.
-			partition (String): Partition label.  
-
-		Returns:
-			[type]: [description]
+			file (str): Path directly to the desired .sin or .img file.
+			partition (str): Partition label.
 		"""
 		if self.device_id == None:
 			return None
