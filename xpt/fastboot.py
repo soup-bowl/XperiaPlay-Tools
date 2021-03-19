@@ -1,16 +1,16 @@
-import subprocess
+from xpt import Com
+from os.path import isfile, join
+from sys import platform
+from subprocess import TimeoutExpired
 import re
 import tempfile
 import zipfile
-from os.path import isfile, join
-from datetime import datetime
-from sys import platform
 
-class Fastboot(object):
+class Fastboot(Com):
 	def __init__(self):
-		self.fastboot = "./resources/platform-tools/fastboot"
+		super().__init__()
+		self.fastboot = self.platform + "/fastboot"
 
-		self.logfile      = "./system.log"
 		self.device_id    = None
 		self.device_model = None
 		vno = self.get_version()
@@ -19,14 +19,6 @@ class Fastboot(object):
 			self._log("Initating Fastboot, using " + self.get_version() + " found at " + self.fastboot + " on " + platform)
 		else:
 			self.available = False
-	
-	def is_available(self):
-		"""For checking if Fastboot is available on the system.
-
-		Returns:
-			boolean: Status on the presence in the system.
-		"""
-		return self.available
 
 	def get_version(self):
 		"""Checks the Fastboot version.
@@ -37,8 +29,9 @@ class Fastboot(object):
 
 		"""
 		try:
-			response = subprocess.run( [self.fastboot, "--version"], capture_output=True, text=True )
+			response = self.run( [self.fastboot, "--version"] )
 		except:
+			self._log("Get version failed.")
 			return None
 
 		return re.findall( "version\s*(.*)", str.splitlines( response.stdout)[0] )[0]
@@ -51,13 +44,15 @@ class Fastboot(object):
 			None: No device connected/detected.
 		"""
 		devices  = []
-		response = str.splitlines( subprocess.run( [self.fastboot, "devices"], capture_output=True, text=True ).stdout )
+		response = str.splitlines( self.run( [self.fastboot, "devices"] ).stdout )
 		if len( response ) == 0:
+			self._log("No fastboot devices found.")
 			return None
 
 		for val in response:
 			devices.append( str.split(val, '\t')[0] )
 
+		self._log(str(len(devices)) + " fastboot devices found.")
 		return devices
 
 	def set_device(self, device):
@@ -68,14 +63,18 @@ class Fastboot(object):
 		"""
 		self.device_id = device
 
-		model = subprocess.run( [self.fastboot, "getvar", "product"], capture_output=True, text=True )
-		self.device_model = re.findall( "product:\s*(.*?)\\n", model.stderr)[0]
+		try:
+			model = self.run( [self.fastboot, "getvar", "product"] )
+			self.device_model = re.findall( "product:\s*(.*?)\\n", model.stderr)[0]
+		except TimeoutExpired:
+			self._log("Fastboot connector timeout of 200 seconds hit - try rebooting and/or a different USB port?")
+			self.device_model = None
+			return None
 
 		self._log("Fastboot device set as " + self.device_model)
 
 	def reboot_device(self):
-		"""
-		Reboots the device.
+		"""Reboots the device.
 
 		Returns:
 			None: No return.
@@ -83,7 +82,7 @@ class Fastboot(object):
 		if self.device_id == None:
 			return None
 		
-		subprocess.run( [self.fastboot, "reboot"] )
+		self.run( [self.fastboot, "reboot"] )
 
 	def flash_ftf(self, file, mode):
 		"""Flashes a sin file to the active fastboot device.
@@ -142,22 +141,9 @@ class Fastboot(object):
 		if self.device_id == None:
 			return None
 
-		if isfile(file):		
-			response = subprocess.run( [self.fastboot, "flash", partition, file], capture_output=True, text=True )
-			if response.stdout != "": self._log(response.stdout)
-			if response.stderr != "": self._log(response.stderr)
+		if isfile(file):
+			# Timeout is 2 hours. If it goes on longer than this, something is seriously wrong.
+			self.run( [self.fastboot, "flash", partition, file], True, 7200 )
 		else:
 			self._log("Could not find " + file + " for " + str(partition) + " flash - skipping.")
 			return None
-
-	def _log(self, message):
-		"""
-		Logs the message to the internally specified file.
-
-		Args:
-			message (String): Message.
-		"""
-		if self.logfile != False and message != "":
-			f = open(self.logfile, "a")
-			f.write( "\n[" + str(datetime.utcnow()) + "]: " + str(message).strip() )
-			f.close()

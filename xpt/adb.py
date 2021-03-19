@@ -1,17 +1,17 @@
-import subprocess
-import re
+from xpt.com import Com
 from datetime import datetime
 from sys import platform
+import re
+import glob
 
-class ADB(object):
+class ADB(Com):
 	def __init__(self):
-		self.adb = "./resources/platform-tools/adb"
+		super().__init__()
+		self.adb = self.platform + "/adb"
 
-		self.rootdir      = "./resources/root/"
-		self.appdir       = "./resources/apps/"
-		self.logfile      = "./system.log"
 		self.device_id    = None
 		self.device_model = None
+		self.system_is_rw = False
 		vno = self.get_version()
 		if vno != None:
 			self.available = True
@@ -19,39 +19,33 @@ class ADB(object):
 			self._log("Initating ADB, using " + self.get_version() + " found at " + self.adb + " on " + platform)
 		else:
 			self.available = False
-	
-	def is_available(self):
-		"""
-		Is the Android debugging package available.
-		"""
-		return self.available
 
 	def get_version(self):
-		"""
-		Gets the active platform tools version.
+		"""Gets the active platform tools version.
 
 		Returns:
 			String: Android Debugging Bridge version string.
 			None: No ADB package found.
 		"""
 		try:
-			response = subprocess.run( [self.adb, "version"], capture_output=True, text=True )
+			response = self.run( [self.adb, "version"] )
 		except:
+			self._log("Get version failed.")
 			return None
 
 		return re.findall( "version\s*([\d.]+)", response.stdout )[0]
 
 	def get_devices_connected(self):
-		"""
-		Gets a list of the connected device serials.
+		"""Gets a list of the connected device serials.
 
 		Returns:
 			Array: The connected device serials.
 			None: No devices were found/responded. 
 		"""
 		devices  = []
-		response = str.splitlines( subprocess.run( [self.adb, "devices"], capture_output=True, text=True ).stdout )
+		response = str.splitlines( self.run( [self.adb, "devices"] ).stdout )
 		if len( response ) == 2:
+			self._log("No adb devices found.")
 			return None
 
 		for val in response:
@@ -59,33 +53,40 @@ class ADB(object):
 				devices.append( str.split(val, '\t')[0] )
 
 		devices.remove('List of devices attached')
-		
+
+		self._log(str(len(devices)) + " adb devices found.")
 		return devices
 
-	def set_device(self, device):
+	def get_app_count(self):
+		"""Counts the apps in the app directory.
+
+		Returns:
+			Int: Count of all files ending with .apk.
 		"""
-		Set the device to be worked on (get them using get_devices_connected()).
+		return len(glob.glob1(self.appdir,"*.apk"))
+
+	def set_device(self, device):
+		"""Set the device to be worked on (get them using get_devices_connected()).
 
 		Args:
 			device (String): Device identifier from Fastboot devices.
 		"""
 		self.device_id = device
 
-		model = subprocess.run( [self.adb, "shell", "getprop", "ro.product.model"], capture_output=True, text=True )
+		model = self.run( [self.adb, "shell", "getprop", "ro.product.model"] )
 		self.device_model = str.split(model.stdout, "\n")[0]
 
 		self._log("ADB device set as " + self.device_model)
 
 	def start_server(self):
-		"""
-		Start the adb response server.
+		"""Start the adb response server.
 		"""
 		if self.available == True:
-			subprocess.run( [self.adb, "start-server"], capture_output=True )
+			self.run( [self.adb, "start-server"] )
+			self._log("Starting up the Android Debugging Bridge server.")
 	
 	def init_zergrush_root(self):
-		"""
-		Root the currently connected Android device with the zergRush exploit.
+		"""Root the currently connected Android device with the zergRush exploit.
 
 		This will install busybox, su binary and Superuser.
 
@@ -117,17 +118,68 @@ class ADB(object):
 		]
 
 		for command in comms:
-			response = subprocess.run( command, capture_output=True, text=True )
-			if response.stdout != "": self._log(response.stdout)
-			if response.stderr != "": self._log(response.stderr)
+			self.run( command )
 		
 		self.reboot_device()
 		
 		return True
 
-	def reboot_device(self, into_fastboot = False):
+	def install_all_apps(self):
+		"""Installs all apks in the app directory.
 		"""
-		Reboots the device.
+		apks = glob.glob(self.appdir + '*.apk')
+		for apk in apks:
+			self._log("Installing app: " + apk)
+			self.install_apk(apk)
+	
+	def install_apk(self, file):
+		"""Installs the specified APK file.
+
+		Args:
+			file (String): Location of the desired apk.
+
+		Returns:
+			Boolean: True if successfully installed, False if an error occurred.
+		"""
+		response = self.run( [self.adb, "install", file] )
+
+		if response.stderr != "":
+			return True
+		else:
+			return False
+
+	def mount_system(self):
+		"""Mounts the system directory as rewritable for root operations.
+
+		Returns:
+			Boolean: Success status. The self.system_is_rw is modified to reflect.
+		"""
+		response = self.run( [self.adb, "shell", "su", "-c", "'mount -o remount,rw /system /system'"] )
+
+		if response.stderr == "":
+			self.system_is_rw = True
+			return True
+		else:
+			return False
+	
+	def remove_system_app(self, file):
+		"""Removes an app by directly removing it.
+
+		Args:
+			file (String): Full filepath to remove.
+
+		Returns:
+			Boolean: Always returns true.
+		"""
+		if self.system_is_rw == False:
+			self.mount_system()
+
+		self.run( [self.adb, "shell", "su", "-c", "'rm " + file + "'"] )
+
+		return True
+
+	def reboot_device(self, into_fastboot = False):
+		"""Reboots the device.
 
 		Args:
 			into_fastboot (bool, optional): Boot into fastboot. Defaults to False.
@@ -142,10 +194,15 @@ class ADB(object):
 		if into_fastboot:
 			extra = "bootloader"
 
-		subprocess.run( [self.adb, "reboot", extra] )
+		self.run( [self.adb, "reboot", extra] )
 	
 	def device_is_rooted(self):
-		response = subprocess.run( [self.adb, "shell", "stat", "/system/bin/su"], capture_output=True, text=True )
+		"""Checks if the device has been rooted.
+
+		Returns:
+			Boolean: Whether the device is rooted or not.
+		"""
+		response = self.run( [self.adb, "shell", "stat", "/system/bin/su"] )
 
 		if "No such file or" in response.stdout:
 			return False;
@@ -153,15 +210,3 @@ class ADB(object):
 			return False;
 		else:
 			return True;
-
-	def _log(self, message):
-		"""
-		Logs the message to the internally specified file.
-
-		Args:
-			message (String): Message.
-		"""
-		if self.logfile != False and message != "":
-			f = open(self.logfile, "a")
-			f.write( "\n[" + str(datetime.utcnow()) + "]: " + str(message).strip() )
-			f.close()

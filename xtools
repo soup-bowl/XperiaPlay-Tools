@@ -1,8 +1,11 @@
 #! /bin/bash
-if ! command -v python3 > /dev/null 2>&1
-then
-	echo "Error: Please install Python3 for this tool to work."
+if command -v python3 > /dev/null 2>&1; then
+	python3 -m xpt
+elif command -v python > /dev/null 2>&1; then
+	python -m xpt
+else
+	echo "Error: Python is not installed."
+	echo "Get Python from your package manager, or here - https://www.python.org/downloads/"
+	echo "Please ensure when prompted, you add Python to PATH. Otherwise xtools will not be able to run."
 	exit 1
 fi
-
-python3 ./main.py
