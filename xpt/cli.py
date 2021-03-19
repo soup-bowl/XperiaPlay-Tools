@@ -25,7 +25,7 @@ def call():
 		if adb.device_model == None:
 			print("Error: Found device in android debugging mode, but a problem occurred during identification. Check system.log for more details.")
 			exit(1)
-		print("Detected Xperia Play " + adb.device_model + " in Android Debugging mode.")
+		print("Detected Xperia Play " + adb.device_model + " on Android " + adb.device_version + " (" + adb.device_build + ") in USB Debugging mode.")
 		print("What do you want to do?")
 		print("")
 		if adb.device_is_rooted():

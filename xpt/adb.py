@@ -9,9 +9,11 @@ class ADB(Com):
 		super().__init__()
 		self.adb = self.platform + "/adb"
 
-		self.device_id    = None
-		self.device_model = None
-		self.system_is_rw = False
+		self.device_id      = None
+		self.device_model   = None
+		self.device_build   = None
+		self.device_version = None
+		self.system_is_rw   = False
 		vno = self.get_version()
 		if vno != None:
 			self.available = True
@@ -75,6 +77,10 @@ class ADB(Com):
 
 		model = self.run( [self.adb, "shell", "getprop", "ro.product.model"] )
 		self.device_model = str.split(model.stdout, "\n")[0]
+		build = self.run( [self.adb, "shell", "getprop", "ro.build.id"] )
+		self.device_build = str.split(build.stdout, "\n")[0]
+		version = self.run( [self.adb, "shell", "getprop", "ro.build.version.release"] )
+		self.device_version = str.split(version.stdout, "\n")[0]
 
 		self._log("ADB device set as " + self.device_model)
 
