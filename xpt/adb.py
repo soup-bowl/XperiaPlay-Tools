@@ -204,7 +204,7 @@ class ADB(Com):
 		Returns:
 			bool: Whether the device is rooted or not.
 		"""
-		response = self.run( [self.adb, "shell", "stat", "/system/bin/su"] )
+		response = self.run( [self.adb, "shell", "stat", "/system/bin/su"], False )
 
 		if "No such file or" in response.stdout:
 			return False;
