@@ -25,7 +25,7 @@ def call():
 		if adb.device_model == None:
 			print("Error: Found device in android debugging mode, but a problem occurred during identification. Check system.log for more details.")
 			exit(1)
-		print("Detected Xperia PLAY " + adb.device_model + " in Android Debugging mode.")
+		print("Detected Xperia Play " + adb.device_model + " in Android Debugging mode.")
 		print("What do you want to do?")
 		print("")
 		if adb.device_is_rooted():
@@ -58,7 +58,7 @@ def call():
 			print("This experimental feature will remove apps determined to be bloatware, or otherwise unnessesary for modern usage.")
 			print("Based upon information found here - https://revive.today/xpapk (cellular).")
 			print("Further apps can be removed without detrimental effects depending on use, see the document linked above.")
-			print("If you encounter issues, please report them at the GitHub tracker - https://github.com/soup-bowl/XPLAY-Manager.")
+			print("If you encounter issues, please report them at the GitHub tracker - https://github.com/soup-bowl/XperiaPlay-Tools.")
 			print("THIS IS REMOVING SYSTEM APPS - BACKUP IMPORTANT DATA BEFORE EXECUTING THIS SCRIPT.")
 			print("")
 			choice = input("Do you wish to continue? [y/N]: ")
@@ -89,7 +89,7 @@ def call():
 		if fastboot.device_model == None:
 			print("Error: Found device in fastboot mode, but a problem occurred during identification. Check system.log for more details.")
 			exit(1)
-		print("Detected Xperia PLAY " + fastboot.device_model + " in fastboot mode.")
+		print("Detected Xperia Play " + fastboot.device_model + " in fastboot mode.")
 		print("What do you want to do?")
 		print("")
 		print("[1] Flash firmware.")

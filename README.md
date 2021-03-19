@@ -1,7 +1,7 @@
-# 📲 Xperia PLAY Tools
+# 📲 Xperia Play Tools
 ⚠️ **This tool is in active development and is unstable!** There is a high chance it may operate unexpectedly and/or brick your device, so use with caution.
 
-The correct method for this device is to use **[Flashtool](https://github.com/Androxyde/Flashtool)**, older versions work more effectively with the Xperia PLAY.
+The correct method for this device is to use **[Flashtool](https://github.com/Androxyde/Flashtool)**, older versions work more effectively with the Xperia Play.
 [See this Reddit Wiki](https://www.reddit.com/r/xperiaplay/wiki/index#wiki_flashtool) for the best information.
 
 ## 💽 Installation
