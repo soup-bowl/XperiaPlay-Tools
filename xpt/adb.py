@@ -212,3 +212,10 @@ class ADB(Com):
 			return False;
 		else:
 			return True;
+
+	def device_is_rootable(self) -> bool:
+		if ((self.device_version == "2.3.4" and self.device_build == "4.0.2.A.0.58") or
+				(self.device_version == "2.3.2" and self.device_build == "3.0.A.2.184")):
+			return True
+		else:
+			return False
