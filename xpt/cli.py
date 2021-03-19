@@ -30,7 +30,8 @@ def call() -> None:
 		print("")
 		if adb.device_is_rooted():
 			print("[-] Device is rooted.")
-		if adb.device_version == "2.3.4" and adb.device_build == "4.0.2.A.0.58":
+		elif ((adb.device_version == "2.3.4" and adb.device_build == "4.0.2.A.0.58") or
+				(adb.device_version == "2.3.2" and adb.device_build == "3.0.A.2.184")):
 			print("[1] Root device (zergRush).")
 		else:
 			print("[-] Root device (fw not supported).")
@@ -47,7 +48,8 @@ def call() -> None:
 			if adb.device_is_rooted():
 				print("Device is already rooted. Exiting.")
 				exit()
-			elif adb.device_version == "2.3.4" and adb.device_build == "4.0.2.A.0.58":
+			elif ((adb.device_version == "2.3.4" and adb.device_build == "4.0.2.A.0.58") or
+					(adb.device_version == "2.3.2" and adb.device_build == "3.0.A.2.184")):
 				print("Rooting device using the zergRush method.")
 				adb.init_zergrush_root()
 				print("Done. Rebooting...")
