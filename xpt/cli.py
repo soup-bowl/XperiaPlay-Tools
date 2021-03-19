@@ -145,7 +145,9 @@ def call() -> None:
 			choice = input("[" + fw + "] Select one: ")
 			if choice == "1" or choice == "2" or choice == "3" or choice == "4":
 				print("Flashing device - do not disconnect your phone...")
-				fastboot.flash_ftf( "./resources/firmwares/" + fw, int(choice) )
+				fastboot.flash_ftf( "./resources/firmwares/" + fw, int(choice), True )
+				print("")
+				print("Flash complete - rebooting...")
 				fastboot.reboot_device()
 			else:
 				print("Exited.")

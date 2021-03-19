@@ -79,12 +79,13 @@ class Fastboot(Com):
 		
 		self.run( [self.fastboot, "reboot"] )
 
-	def flash_ftf(self, file, mode) -> bool:
+	def flash_ftf(self, file, mode, print_output = False) -> bool:
 		"""Flashes a sin file to the active fastboot device.
 
 		Args:
 			file (str): Location of sin file (will be extracted to TMP).
 			mode (int): 1 for boot, 2 for system, 3 for both, 4 for entire.
+			print_output (bool): Print the running comand to screen.
 
 		Returns:
 			bool: Success status.
@@ -111,30 +112,36 @@ class Fastboot(Com):
 			with zipfile.ZipFile(file, 'r') as zip_ref:
 				self._log("Flash executed - File: " + file + "; Mode: " + str(mode))
 				zip_ref.extractall(dirpath)
-				
+
 				for partiton in fmode:
 					if partiton == 'boot':
-						self._flash_firmware(dirpath + '/kernel.sin', partiton)
+						ffile = 'kernel.sin'
 					if partiton == 'system':
-						self._flash_firmware(dirpath + '/system.sin', partiton)
+						ffile = 'system.sin'
 					if partiton == 'userdata':
-						self._flash_firmware(dirpath + '/userdata.sin', partiton)
+						ffile = 'userdata.sin'
+						
+					self._flash_firmware(dirpath + '/' + ffile, partiton, print_output)
 
 		return True
 
 
-	def _flash_firmware(self, file, partition) -> None:
+	def _flash_firmware(self, file, partition, print_output = False) -> None:
 		"""Flashes the specified file to the partition.
 
 		Args:
 			file (str): Path directly to the desired .sin or .img file.
 			partition (str): Partition label.
+			print_output (bool): Print the running comand to screen.
 		"""
 		if self.device_id == None:
 			return None
 
 		if isfile(file):
 			# Timeout is 2 hours. If it goes on longer than this, something is seriously wrong.
+			if print_output:
+				print("> fastboot flash " + partition + ' ' + file)
+
 			self.run( [self.fastboot, "flash", partition, file], True, 7200 )
 		else:
 			self._log("Could not find " + file + " for " + str(partition) + " flash - skipping.")
