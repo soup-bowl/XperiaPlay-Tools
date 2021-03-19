@@ -3,6 +3,7 @@ resources/apps/*.apk
 resources/firmwares/*.ftf
 resources/platform-tools/*
 prepared/
+.DS_Store
 system.log
 
 # Byte-compiled / optimized / DLL files

@@ -20,7 +20,7 @@ class Download(Com):
 		if model == "R800i":
 			with tempfile.TemporaryDirectory() as dirpath:
 				url = "https://files.soupbowl.io/xperia/firmwares/R800i.zip"
-				req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'}) # My NGINX server hates Python?
+				req = urllib.request.Request(url, headers={'User-Agent': 'XPlaytools/1.0'})
 
 				try:
 					with urllib.request.urlopen(req) as response, open(dirpath + "/R800i.zip", 'wb') as out_file:

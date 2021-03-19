@@ -109,14 +109,13 @@ def call() -> None:
 			print("")
 			print("[i] Download R800i firmware pack.")
 			print("[q] Quit.")
-			choice_fw = input("Select one: ")
+			choice_fw = input("[Flash] Select one: ")
 
 			if choice_fw == "i":
 				print("Requesting pack from server. This may take some time to download, please wait...")
 				success = Download().download_firmware("R800i")
 				if success:
 					print("Firmware pack downloaded. They should now appear in the firmware selector.")
-					call()
 					exit()
 				else:
 					print("Error: A problem was encountered. Check the system.log file to see why.")
@@ -138,7 +137,7 @@ def call() -> None:
 			print("[4] Complete flash.")
 			print("[q] Cancel.")
 			print("")
-			choice = input("Select one: ")
+			choice = input("[" + fw + "] Select one: ")
 			if choice == "1" or choice == "2" or choice == "3" or choice == "4":
 				print("Flashing device - do not disconnect your phone...")
 				fastboot.flash_ftf( "./resources/firmwares/" + fw, int(choice) )
