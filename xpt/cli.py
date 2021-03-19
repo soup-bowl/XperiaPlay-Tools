@@ -30,8 +30,10 @@ def call() -> None:
 		print("")
 		if adb.device_is_rooted():
 			print("[-] Device is rooted.")
+		if adb.device_version == "2.3.4" and adb.device_build == "4.0.2.A.0.58":
+			print("[1] Root device (zergRush).")
 		else:
-			print("[1] Root device.")
+			print("[-] Root device (fw not supported).")
 		print("[2] Install all apps (" + str(adb.get_app_count()) + " found).")
 		if adb.device_is_rooted():
 			print("[3] Remove recognised bloatware (experimental).")
@@ -45,9 +47,12 @@ def call() -> None:
 			if adb.device_is_rooted():
 				print("Device is already rooted. Exiting.")
 				exit()
-			print("Rooting device using the zergRush method.")
-			adb.init_zergrush_root()
-			print("Done. Rebooting...")
+			elif adb.device_version == "2.3.4" and adb.device_build == "4.0.2.A.0.58":
+				print("Rooting device using the zergRush method.")
+				adb.init_zergrush_root()
+				print("Done. Rebooting...")
+			else:
+				print("No root method for " + adb.device_model + " " + adb.device_version + " (" + adb.device_build + ").")
 		if choice == "2":
 			adb.install_all_apps()
 			print("Completed - exiting.")
