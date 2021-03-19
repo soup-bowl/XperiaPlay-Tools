@@ -1,11 +1,12 @@
 from setuptools import setup, find_packages
+from xpt import __version__
 
 with open('LICENSE') as f:
     license = f.read()
 
 setup(
     name='xperiaplaytools',
-    version='0.1.0',
+    version=__version__,
     description='Blah',
     author='soup-bowl',
     author_email='code@soupbowl.io',
