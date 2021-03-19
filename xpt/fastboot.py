@@ -111,7 +111,12 @@ class Fastboot(Com):
 		with tempfile.TemporaryDirectory() as dirpath:
 			with zipfile.ZipFile(file, 'r') as zip_ref:
 				self._log("Flash executed - File: " + file + "; Mode: " + str(mode))
-				zip_ref.extractall(dirpath)
+				
+				try:
+					zip_ref.extractall(dirpath)
+				except:
+					self._log("Error: Unexpected error during ftf extraction. Possibly a corrupt firmware?")
+					raise
 
 				for partiton in fmode:
 					if partiton == 'boot':
@@ -120,7 +125,7 @@ class Fastboot(Com):
 						ffile = 'system.sin'
 					if partiton == 'userdata':
 						ffile = 'userdata.sin'
-						
+
 					self._flash_firmware(dirpath + '/' + ffile, partiton, print_output)
 
 		return True
