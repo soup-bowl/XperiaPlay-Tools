@@ -1,5 +1,4 @@
 from xpt import Fastboot
-from .context import xpt
 
 import unittest
 

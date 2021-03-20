@@ -1,5 +1,4 @@
 from xpt import ADB
-from .context import xpt
 
 import unittest
 
