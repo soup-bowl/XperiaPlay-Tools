@@ -29,7 +29,7 @@ def main() -> None:
 		print("- For ADB access, ensure Android Debugging is enabled. The setting can be found (Android 2.3) in Applications > Development > USB Debugging.")
 		print("- For fastboot, ensure your device is powered off. Then, plug into USB whilst holding down the magnifying glass button. If done correctly, the power button should illuminate blue.")
 
-def adb_path(adb, device):
+def adb_path(adb, device) -> None:
 	"""Android Debugging Bridge pathway.
 
 	Args:
@@ -105,7 +105,7 @@ def adb_path(adb, device):
 	else:
 		print("Exited.")
 
-def fastboot_path(fastboot, device):
+def fastboot_path(fastboot, device) -> None:
 	"""Fastboot pathway.
 
 	Args:
