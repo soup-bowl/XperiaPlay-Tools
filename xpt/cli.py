@@ -145,8 +145,9 @@ def fastboot_path(fastboot, device) -> None:
 		elif choice_fw == "q":
 			print("Exited.")
 			exit()
-
-		mesg   = "What level of flash do you want?\nThis tool will not interact with baseband, please use flashtool for a complete flash instead."
+ 
+		mesg   = "What level of flash do you want?\nCurrently, this tool will not interact with baseband or adjust partition sizes, so "
+		mesg  += "please use Flashtool for the full experience if those features are required."
 		choice = dialog_static(mesg, choice_fw, {
 			'1': 'Flash kernel.',
 			'2': 'Flash system.',
