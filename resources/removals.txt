@@ -24,6 +24,7 @@
 /system/app/usb-mtp-update-wrapper.apk
 /system/app/YouTubeKaraokePlugin.apk
 /system/app/DigitalClockWidget.apk
+/system/app/widgetdigitalclock.apk
 /system/app/CdfInfoAccessor.apk
 /system/app/WapPush.apk
 /system/app/SecureClockJava.apk
@@ -134,3 +135,10 @@
 /system/app/DefaultCapabilities.apk
 /system/app/Browser.apk
 /system/app/GoogleFeedback.apk
+/system/app/facebook.apk
+/system/app/com.sonyericsson.androidapp.storefront.apk
+/system/app/officesuite.apk
+/system/app/trackid.apk
+/system/app/widgetfavouritepeople.apk
+/system/app/playnowclientarvato.apk
+/system/app/usersupport.apk
