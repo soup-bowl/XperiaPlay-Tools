@@ -2,6 +2,8 @@ from xpt import ADB, Fastboot, Download, __version__
 from os import listdir
 from os.path import isfile, join
 
+resources = './resources/';
+
 def main() -> None:
 	"""Triggers the guided xtools process, running through both Android Debugging and Fastboot.
 	"""
@@ -84,7 +86,7 @@ def adb_path(adb, device) -> None:
 		choice = input("Do you wish to continue? [y/N]: ")
 		if choice == "y":
 			apps = []
-			with open('./resources/removals.txt') as f:
+			with open(resources + 'removals.txt') as f:
 				apps = [line.rstrip() for line in f]
 			
 			for app in apps:
@@ -129,7 +131,7 @@ def fastboot_path(fastboot, device) -> None:
 	choice = input("[fastboot] Select one: ")
 
 	if choice == "1":
-		choice_fw = file_selection("Select firmware?", "./resources/firmwares", 'ftf', {"i": "Download R800i firmware pack."})
+		choice_fw = file_selection("Select firmware?", resources + "firmwares", 'ftf', {"i": "Download R800i firmware pack."})
 
 		if choice_fw == "i":
 			print("Requesting pack from server. This may take some time to download, please wait...")
@@ -157,7 +159,7 @@ def fastboot_path(fastboot, device) -> None:
 		if choice == "1" or choice == "2" or choice == "3" or choice == "4":
 			print("Flashing device - do not disconnect your phone...")
 			try:
-				fastboot.flash_ftf( "./resources/firmwares/" + choice_fw, int(choice), True )
+				fastboot.flash_ftf( resources + "firmwares/" + choice_fw, int(choice), True )
 			except:
 				print("Error: Hit a problem during the firmware flash. Check the system.log to understand why.")
 				exit(1)
