@@ -88,8 +88,10 @@ def adb_path(adb, device) -> None:
 				apps = [line.rstrip() for line in f]
 			
 			for app in apps:
+				print("\rRemoving: " + app, end=" ")
 				adb.remove_system_app(app)
 			
+			print("")
 			print("Complete. Rebooting...")
 			adb.reboot_device()
 			exit()
