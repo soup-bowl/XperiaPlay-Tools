@@ -129,11 +129,16 @@ class ADB(Com):
 		
 		return True
 
-	def install_all_apps(self) -> None:
+	def install_all_apps(self, print_output = False) -> None:
 		"""Installs all apks in the app directory.
+
+		Args:
+			print_output (bool): Print the running comand to screen.
 		"""
 		apks = glob.glob(self.appdir + '*.apk')
 		for apk in apks:
+			if print_output:
+				print("Installing app: " + apk)
 			self._log("Installing app: " + apk)
 			self.install_apk(apk)
 	

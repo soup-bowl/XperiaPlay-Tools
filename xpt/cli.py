@@ -56,7 +56,7 @@ def adb_path(adb, device) -> None:
 	print("[r] Reboot device ([f] into fastboot).")
 	print("[q] Cancel.")
 	print("")
-	choice = input("Select one: ")
+	choice = input("[adb] Select one: ")
 
 	if choice == "1":
 		if adb.device_is_rooted():
@@ -69,7 +69,7 @@ def adb_path(adb, device) -> None:
 		else:
 			print("No root method for " + adb.device_model + " " + adb.device_version + " (" + adb.device_build + ").")
 	if choice == "2":
-		adb.install_all_apps()
+		adb.install_all_apps(True)
 		print("Completed - exiting.")
 	if choice == "3":
 		if not adb.device_is_rooted():
@@ -124,7 +124,7 @@ def fastboot_path(fastboot, device) -> None:
 	print("[r] Reboot device.")
 	print("[q] Cancel.")
 	print("")
-	choice = input("Select one: ")
+	choice = input("[fastboot] Select one: ")
 
 	if choice == "1":
 		print("Select firmware?")
