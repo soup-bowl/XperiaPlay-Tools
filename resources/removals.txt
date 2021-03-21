@@ -141,4 +141,17 @@
 /system/app/trackid.apk
 /system/app/widgetfavouritepeople.apk
 /system/app/playnowclientarvato.apk
+/system/app/playnowclient.apk
+/system/app/playnowappinstaller.apk
 /system/app/usersupport.apk
+/system/app/bbc.iplayer.android.apk
+/system/app/touchnote.apk
+/system/app/timescapelegacywrapper.apk
+/system/app/getgames.apk
+/system/app/com.whatsapp.apk
+/system/app/LivewareManager.apk
+
+/system/app/BruceLee.apk
+/system/app/Sims.apk
+/system/app/tetris.apk
+/system/app/com.sony.playstation.ncea00344_1.apk
