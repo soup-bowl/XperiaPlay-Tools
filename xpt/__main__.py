@@ -1,3 +1,3 @@
-from xpt.cli import call
+from xpt.cli import main
 
-call()
+main()
