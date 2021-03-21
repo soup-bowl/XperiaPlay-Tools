@@ -12,8 +12,9 @@ class Fastboot(Com):
 		super().__init__()
 		self.fastboot = self.platform + "/fastboot"
 
-		self.device_id    = None
-		self.device_model = None
+		self.device_id     = None
+		self.device_model  = None
+		self.device_secure = True
 		vno = self.get_version()
 		if vno != None:
 			self.available = True
@@ -64,9 +65,14 @@ class Fastboot(Com):
 		try:
 			model = self.run( [self.fastboot, "getvar", "product"] )
 			self.device_model = re.findall( "product:\s*(.*?)\\n", model.stderr)[0]
+			secure = self.run( [self.fastboot, "getvar", "secure"] )
+			secure = re.findall( "secure:\s*(.*?)\\n", secure.stderr)[0]
+			if secure == 'no':
+				self.device_secure = False
 		except TimeoutExpired:
 			self._log("Fastboot connector timeout of 200 seconds hit - try rebooting and/or a different USB port?")
-			self.device_model = None
+			self.device_model  = None
+			self.device_secure = True
 			return None
 
 		self._log("Fastboot device set as " + self.device_model)

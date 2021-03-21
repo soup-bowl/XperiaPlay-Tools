@@ -123,6 +123,11 @@ def fastboot_path(fastboot, device) -> None:
 		print("Error: Found device in fastboot mode, but a problem occurred during identification. Check system.log for more details.")
 		exit(1)
 	
+	if fastboot.device_secure:
+		print("Error: Your bootloader appears to be locked. Please unlock this before you can proceed into Fastboot tools.")
+		print("See here for advice: https://www.reddit.com/r/xperiaplay/wiki/index#wiki_bootloader_unlocking")
+		exit(1)
+	
 	mesg   = "Detected Xperia Play " + fastboot.device_model + " in fastboot mode.\nWhat do you want to do?"
 	choice = dialog_static(mesg, 'fastboot', {
 		'1': 'Flash firmware.'
