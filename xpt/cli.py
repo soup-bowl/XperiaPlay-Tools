@@ -42,23 +42,16 @@ def adb_path(adb, device) -> None:
 	if adb.device_model == None:
 		print("Error: Found device in android debugging mode, but a problem occurred during identification. Check system.log for more details.")
 		exit(1)
-	print("Detected Xperia Play " + adb.device_model + " on Android " + adb.device_version + " (" + adb.device_build + ") in USB Debugging mode.")
-	print("What do you want to do?")
-	print("")
-	if adb.device_is_rooted():
-		print("[-] Device is rooted.")
-	elif adb.device_is_rootable():
-		print("[1] Root device (zergRush).")
-	else:
-		print("[-] Root device (fw not supported).")
-	print("[2] Install apps (" + str(adb.get_app_count()) + " found).")
-	if adb.device_is_rooted():
-		print("[3] Remove recognised bloatware (experimental).")
-	print("")
-	print("[r] Reboot device ([f] into fastboot).")
-	print("[q] Cancel.")
-	print("")
-	choice = input("[adb] Select one: ")
+	
+	mesg   = "Detected Xperia Play " + adb.device_model + " on Android " + adb.device_version + " (" + adb.device_build + ") in USB Debugging mode.\nWhat do you want to do?"
+	choice = dialog_static(mesg, 'adb', {
+		'1': 'Root device (zergRush).',
+		'2': 'Install apps (' + str(adb.get_app_count()) + ' found).',
+		'3': 'Remove recognised bloatware (experimental).'
+	}, {
+		'r': 'Reboot device.',
+		'f': 'Reboot into fastboot.'
+	})
 
 	if choice == "1":
 		if adb.device_is_rooted():
@@ -71,7 +64,7 @@ def adb_path(adb, device) -> None:
 		else:
 			print("No root method for " + adb.device_model + " " + adb.device_version + " (" + adb.device_build + ").")
 	if choice == "2":
-		choice = file_selection("Which app to install?", "App", resources + "apps/", "apk", {"a": "Install all."})
+		choice = dialog_file_selection("Which app to install?", "App", resources + "apps/", "apk", {"a": "Install all."})
 		if choice == "a":
 			adb.install_all_apps(True)
 		elif choice == "q":
@@ -92,6 +85,7 @@ def adb_path(adb, device) -> None:
 		print("THIS IS REMOVING SYSTEM APPS - BACKUP IMPORTANT DATA BEFORE EXECUTING THIS SCRIPT.")
 		print("")
 		choice = input("Do you wish to continue? [y/N]: ")
+
 		if choice == "y":
 			apps = []
 			with open(resources + 'removals.txt') as f:
@@ -128,18 +122,16 @@ def fastboot_path(fastboot, device) -> None:
 	if fastboot.device_model == None:
 		print("Error: Found device in fastboot mode, but a problem occurred during identification. Check system.log for more details.")
 		exit(1)
-	print("Detected Xperia Play " + fastboot.device_model + " in fastboot mode.")
-	print("What do you want to do?")
-	print("")
-	print("[1] Flash firmware.")
-	print("")
-	print("[r] Reboot device.")
-	print("[q] Cancel.")
-	print("")
-	choice = input("[fastboot] Select one: ")
+	
+	mesg   = "Detected Xperia Play " + fastboot.device_model + " in fastboot mode.\nWhat do you want to do?"
+	choice = dialog_static(mesg, 'fastboot', {
+		'1': 'Flash firmware.'
+	}, {
+		'r': 'Reboot device.'
+	})
 
 	if choice == "1":
-		choice_fw = file_selection("Select firmware?", "Flash", resources + "firmwares", 'ftf', {"i": "Download R800i firmware pack."})
+		choice_fw = dialog_file_selection("Select firmware?", "Flash", resources + "firmwares", 'ftf', {"i": "Download R800i firmware pack."})
 
 		if choice_fw == "i":
 			print("Requesting pack from server. This may take some time to download, please wait...")
@@ -154,16 +146,14 @@ def fastboot_path(fastboot, device) -> None:
 			print("Exited.")
 			exit()
 
-		print("What level of flash do you want?")
-		print("This tool will not interact with baseband, please use flashtool for a complete flash instead.")
-		print("")
-		print("[1] Flash kernel.")
-		print("[2] Flash system.")
-		print("[3] Flash kernel + system.")
-		print("[4] Complete flash.")
-		print("[q] Cancel.")
-		print("")
-		choice = input("[" + choice_fw + "] Select one: ")
+		mesg   = "What level of flash do you want?\nThis tool will not interact with baseband, please use flashtool for a complete flash instead."
+		choice = dialog_static(mesg, choice_fw, {
+			'1': 'Flash kernel.',
+			'2': 'Flash system.',
+			'3': 'Flash kernel + system.',
+			'4': 'Complete flash.'
+		})
+
 		if choice == "1" or choice == "2" or choice == "3" or choice == "4":
 			print("Flashing device - do not disconnect your phone...")
 			try:
@@ -180,8 +170,41 @@ def fastboot_path(fastboot, device) -> None:
 		fastboot.reboot_device()
 	else:
 		print("Exited.")
-	
-def file_selection(label, choice_label, directory, extension, additionals = {}) -> str:
+
+def dialog_static(label, choice_label, choices, choices_end = {}) -> str:
+	"""Generates a selection dialog.
+
+	Args:
+		label (str): Title to show at the top.
+		choice_label (str): Shown next to the 'select one' dialog.
+		choices (dict): First option set.
+		choices_end (dict, optional): Second option set, appearing next to quit.
+
+	Returns:
+		str: Chosen value.
+	"""
+	print(label)
+	print("")
+	for key, text in choices.items():
+		print("[" + key + "] " + text)
+	print("")
+	for key, text in choices_end.items():
+		print("[" + key + "] " + text)
+	print("[q] Cancel.")
+	print("")
+
+	selected = input("[" + choice_label + "] Select one: ")
+
+	for key, text in choices.items():
+		if key == selected:
+			return key
+	for key, text in choices_end.items():
+		if key == selected:
+			return key
+	return "q"
+
+
+def dialog_file_selection(label, choice_label, directory, extension, additionals = {}) -> str:
 	"""Generates a file selection CLI dialog.
 
 	Args:
