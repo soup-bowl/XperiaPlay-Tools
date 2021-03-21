@@ -124,6 +124,11 @@ class Fastboot(Com):
 					self._log("Error: Unexpected error during ftf extraction. Possibly a corrupt firmware?")
 					raise
 
+				manifest_file = dirpath + '/META-INF/MANIFEST.MF'
+				if isfile(manifest_file):
+					with open(manifest_file, 'r') as file:
+						self._log( 'info: ' + str(file.read().replace('\n', ' / ')) )
+
 				for partiton in fmode:
 					if partiton == 'boot':
 						ffile = 'kernel.sin'
