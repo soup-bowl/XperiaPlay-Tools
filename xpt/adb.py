@@ -137,12 +137,10 @@ class ADB(Com):
 		"""
 		apks = glob.glob(self.appdir + '*.apk')
 		for apk in apks:
-			if print_output:
-				print("Installing app: " + apk)
 			self._log("Installing app: " + apk)
-			self.install_apk(apk)
+			self.install_apk(apk, print_output)
 	
-	def install_apk(self, file) -> None:
+	def install_apk(self, file, print_output = False) -> None:
 		"""Installs the specified APK file.
 
 		Args:
@@ -150,7 +148,11 @@ class ADB(Com):
 
 		Returns:
 			Boolean: True if successfully installed, False if an error occurred.
+			print_output (bool): Print the running comand to screen.
 		"""
+		if print_output:
+			print("Installing app: " + file)
+		
 		response = self.run( [self.adb, "install", file] )
 
 		if response.stderr != "":

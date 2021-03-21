@@ -51,7 +51,7 @@ def adb_path(adb, device) -> None:
 		print("[1] Root device (zergRush).")
 	else:
 		print("[-] Root device (fw not supported).")
-	print("[2] Install all apps (" + str(adb.get_app_count()) + " found).")
+	print("[2] Install apps (" + str(adb.get_app_count()) + " found).")
 	if adb.device_is_rooted():
 		print("[3] Remove recognised bloatware (experimental).")
 	print("")
@@ -71,8 +71,16 @@ def adb_path(adb, device) -> None:
 		else:
 			print("No root method for " + adb.device_model + " " + adb.device_version + " (" + adb.device_build + ").")
 	if choice == "2":
-		adb.install_all_apps(True)
+		choice = file_selection("Which app to install?", "App", resources + "apps/", "apk", {"a": "Install all."})
+		if choice == "a":
+			adb.install_all_apps(True)
+		elif choice == "q":
+			exit("Exiting.")
+		else:
+			adb.install_apk(resources + "apps/" + choice, True)
+		
 		print("Completed - exiting.")
+		exit()
 	if choice == "3":
 		if not adb.device_is_rooted():
 			print("Device must be rooted for this action to be performed. Exiting.")
@@ -131,7 +139,7 @@ def fastboot_path(fastboot, device) -> None:
 	choice = input("[fastboot] Select one: ")
 
 	if choice == "1":
-		choice_fw = file_selection("Select firmware?", resources + "firmwares", 'ftf', {"i": "Download R800i firmware pack."})
+		choice_fw = file_selection("Select firmware?", "Flash", resources + "firmwares", 'ftf', {"i": "Download R800i firmware pack."})
 
 		if choice_fw == "i":
 			print("Requesting pack from server. This may take some time to download, please wait...")
@@ -173,11 +181,12 @@ def fastboot_path(fastboot, device) -> None:
 	else:
 		print("Exited.")
 	
-def file_selection(label, directory, extension, additionals = {}) -> str:
+def file_selection(label, choice_label, directory, extension, additionals = {}) -> str:
 	"""Generates a file selection CLI dialog.
 
 	Args:
 		label (str): Title to show at the top.
+		choice_label (str): Shown next to the 'select one' dialog.
 		directory (str): Directory to enumerate.
 		extension (str): Desired file extension.
 		additionals (dict, optional): Any additional options desired.
@@ -195,7 +204,7 @@ def file_selection(label, directory, extension, additionals = {}) -> str:
 		print("[" + key + "] " + additional)
 	print("[q] Quit.")
 
-	selected = input("[Flash] Select one: ")
+	selected = input("[" + choice_label + "] Select one: ")
 
 	try:
 		fw = ftfs[int(selected)]
