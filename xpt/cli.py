@@ -129,16 +129,7 @@ def fastboot_path(fastboot, device) -> None:
 	choice = input("[fastboot] Select one: ")
 
 	if choice == "1":
-		print("Select firmware?")
-		print("")
-		path = "./resources/firmwares"
-		ftfs = [f for f in listdir(path) if isfile(join(path, f))]
-		for index, ftf in enumerate(ftfs, start=0):
-			print("[" + str(index) + "] " + ftf + ".")
-		print("")
-		print("[i] Download R800i firmware pack.")
-		print("[q] Quit.")
-		choice_fw = input("[Flash] Select one: ")
+		choice_fw = file_selection("Select firmware?", "./resources/firmwares", 'ftf', {"i": "Download R800i firmware pack."})
 
 		if choice_fw == "i":
 			print("Requesting pack from server. This may take some time to download, please wait...")
@@ -149,12 +140,8 @@ def fastboot_path(fastboot, device) -> None:
 			else:
 				print("Error: A problem was encountered. Check the system.log file to see why.")
 				exit(1)
-		
-		try:
-			fw = ftfs[int(choice_fw)]
-			print(fw)
-		except (IndexError, ValueError) as e:
-			print("Firmware invalid or opted to quit - exited.")
+		elif choice_fw == "q":
+			print("Exited.")
 			exit()
 
 		print("What level of flash do you want?")
@@ -166,11 +153,11 @@ def fastboot_path(fastboot, device) -> None:
 		print("[4] Complete flash.")
 		print("[q] Cancel.")
 		print("")
-		choice = input("[" + fw + "] Select one: ")
+		choice = input("[" + choice_fw + "] Select one: ")
 		if choice == "1" or choice == "2" or choice == "3" or choice == "4":
 			print("Flashing device - do not disconnect your phone...")
 			try:
-				fastboot.flash_ftf( "./resources/firmwares/" + fw, int(choice), True )
+				fastboot.flash_ftf( "./resources/firmwares/" + choice_fw, int(choice), True )
 			except:
 				print("Error: Hit a problem during the firmware flash. Check the system.log to understand why.")
 				exit(1)
@@ -183,3 +170,36 @@ def fastboot_path(fastboot, device) -> None:
 		fastboot.reboot_device()
 	else:
 		print("Exited.")
+	
+def file_selection(label, directory, extension, additionals = {}) -> str:
+	"""Generates a file selection CLI dialog.
+
+	Args:
+		label (str): Title to show at the top.
+		directory (str): Directory to enumerate.
+		extension (str): Desired file extension.
+		additionals (dict, optional): Any additional options desired.
+
+	Returns:
+		str: Either the chosen filename, the additional option, or as a catch-all - (q)uit.
+	"""
+	print(label)
+	print("")
+	ftfs = [f for f in listdir(directory) if isfile(join(directory, f))]
+	for index, file in enumerate(ftfs, start=0):
+		print("[" + str(index) + "] " + file + ".")
+	print("")
+	for key, additional in additionals.items():
+		print("[" + key + "] " + additional)
+	print("[q] Quit.")
+
+	selected = input("[Flash] Select one: ")
+
+	try:
+		fw = ftfs[int(selected)]
+		return fw
+	except:
+		for key, additional in additionals.items():
+			if key == selected:
+				return key
+		return "q"
