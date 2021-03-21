@@ -8,10 +8,10 @@ def main() -> None:
 	"""Triggers the guided xtools process, running through both Android Debugging and Fastboot.
 	"""
 
-	print("Xperia Play Tools by soup-bowl - Version " + __version__)
-
 	adb      = ADB()
 	fastboot = Fastboot()
+
+	print("Xperia Play Tools by soup-bowl - Version " + __version__ + ", using Android platform-tools " + adb.get_version() + ".")
 
 	adb_devices = adb.get_devices_connected()
 	fbt_devices = fastboot.get_devices_connected()
@@ -30,6 +30,8 @@ def main() -> None:
 		print("Could not find an Android device in either ADB or Fastboot status.")
 		print("- For ADB access, ensure Android Debugging is enabled. The setting can be found (Android 2.3) in Applications > Development > USB Debugging.")
 		print("- For fastboot, ensure your device is powered off. Then, plug into USB whilst holding down the magnifying glass button. If done correctly, the power button should illuminate blue.")
+	
+	adb.end_server()
 
 def adb_path(adb, device) -> None:
 	"""Android Debugging Bridge pathway.

@@ -90,6 +90,13 @@ class ADB(Com):
 			self.run( [self.adb, "start-server"] )
 			self._log("Starting up the Android Debugging Bridge server.")
 	
+	def end_server(self) -> None:
+		"""Stop the adb response server.
+		"""
+		if self.available == True:
+			self.run( [self.adb, "kill-server"] )
+			self._log("Shutting down up the Android Debugging Bridge server.")
+	
 	def init_zergrush_root(self) -> bool:
 		"""Root the currently connected Android device with the zergRush exploit.
 
