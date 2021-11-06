@@ -45,7 +45,9 @@ def adb_path(adb, device) -> None:
 		print("Error: Found device in android debugging mode, but a problem occurred during identification. Check system.log for more details.")
 		exit(1)
 	
-	mesg   = "Detected Xperia Play " + adb.device_model + " on Android " + adb.device_version + " (" + adb.device_build + ") in USB Debugging mode.\nWhat do you want to do?"
+	mesg  = "Detected Xperia Play " + adb.device_model + " on Android " + adb.device_version + " (" + adb.device_build + ") in USB Debugging mode.\n"
+	mesg += "Device has been detected as " + ( "rooted!" if adb.device_is_rooted() else "not rooted." ) + "\n\n"
+	mesg += "What do you want to do?"
 	choice = dialog_static(mesg, 'adb', {
 		'1': 'Root device (zergRush).',
 		'2': 'Install apps (' + str(adb.get_app_count()) + ' found).',
