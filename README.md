@@ -5,7 +5,9 @@ The correct method for this device is to use **[Flashtool](https://github.com/An
 [See this Reddit Wiki](https://www.reddit.com/r/xperiaplay/wiki/index#wiki_flashtool) for the best information.
 
 ## 💽 Installation
-**[Download the latest release version](https://github.com/soup-bowl/XperiaPlay-Tools/releases/latest)**. The tool will work on **Windows, macOS (Intel) and Linux**.
+**[Download the latest release version](https://github.com/soup-bowl/XperiaPlay-Tools/releases/latest)**. The tool should work on **Windows, macOS (Intel) and Linux**.
+
+**⚠️ I don't have a macOS or Windows machine to test with. Use with caution - testers welcome.**
 
 **Python 3.X** (tested on 3.8) is required for this tool to work.
 
