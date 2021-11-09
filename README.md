@@ -1,4 +1,6 @@
 # 📲 Xperia Play Tools
+[![CodeFactor](https://www.codefactor.io/repository/github/soup-bowl/xperiaplay-tools/badge)](https://www.codefactor.io/repository/github/soup-bowl/xperiaplay-tools)
+
 ⚠️ **This tool is in active development and is unstable!** There is a high chance it may operate unexpectedly and/or brick your device, so use with caution.
 
 The correct method for this device is to use **[Flashtool](https://github.com/Androxyde/Flashtool)**, older versions work more effectively with the Xperia Play.
