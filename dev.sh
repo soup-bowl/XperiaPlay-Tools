@@ -3,13 +3,13 @@
 
 case "$OSTYPE" in
 	"linux"*)
-		curl -o ./resources/pt.zip https://files.soupbowl.io/xperia/platform-tools/platform-tools_r26.0.1-linux.zip
+		curl -o ./resources/pt.zip https://dl.google.com/android/repository/platform-tools_r26.0.1-linux.zip
 		unzip -o ./resources/pt.zip -d ./resources
 		rm ./resources/pt.zip
 		;;
 
 	"darwin"*)
-		curl -o ./resources/pt.zip https://files.soupbowl.io/xperia/platform-tools/platform-tools_r26.0.1-darwin.zip
+		curl -o ./resources/pt.zip https://dl.google.com/android/repository/platform-tools_r26.0.1-darwin.zip
 		unzip -o ./resources/pt.zip -d ./resources
 		rm ./resources/pt.zip
 		;;
